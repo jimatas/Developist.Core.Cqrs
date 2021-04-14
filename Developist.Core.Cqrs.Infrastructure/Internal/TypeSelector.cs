@@ -21,7 +21,7 @@ namespace Developist.Core.Cqrs
             this.types = types ?? throw new ArgumentNullException(nameof(types));
         }
 
-        public LifetimeSelector AsImplementedInterfaces()
+        public TypeRegistrationSelector AsImplementedInterfaces()
         {
             foreach (var type in types)
             {
@@ -35,7 +35,7 @@ namespace Developist.Core.Cqrs
                 }
             }
 
-            return new LifetimeSelector(services, typeRegistrations);
+            return new TypeRegistrationSelector(services, typeRegistrations);
 
             static bool IsRegistrable(Type iface) => !(iface.IsNotPublic || iface.IsNested || IsDisposable(iface));
             static bool IsDisposable(Type iface) => iface == typeof(IDisposable) || iface == typeof(IAsyncDisposable);

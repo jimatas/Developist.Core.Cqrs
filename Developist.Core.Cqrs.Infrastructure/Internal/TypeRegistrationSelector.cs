@@ -8,12 +8,12 @@ using System.Collections.Generic;
 
 namespace Developist.Core.Cqrs
 {
-    internal class LifetimeSelector
+    internal class TypeRegistrationSelector
     {
         private readonly IServiceCollection services;
         private readonly IDictionary<Type, ICollection<Type>> typeRegistrations;
 
-        public LifetimeSelector(IServiceCollection services, IDictionary<Type, ICollection<Type>> typeRegistrations)
+        public TypeRegistrationSelector(IServiceCollection services, IDictionary<Type, ICollection<Type>> typeRegistrations)
         {
             this.services = services ?? throw new ArgumentNullException(nameof(services));
             this.typeRegistrations = typeRegistrations ?? throw new ArgumentNullException(nameof(typeRegistrations));
