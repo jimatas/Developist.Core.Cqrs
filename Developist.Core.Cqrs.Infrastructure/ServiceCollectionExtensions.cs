@@ -60,7 +60,7 @@ namespace Developist.Core.Cqrs
 
             void AddOpenGenericHandlers()
             {
-                foreach (var openGenericInterface in new[] { typeof(ICommandHandler<>), typeof(IQueryHandler<,>) })
+                foreach (var openGenericInterface in new[] { typeof(ICommandHandler<>), typeof(IQueryHandler<,>), typeof(IEventHandler<>) })
                 {
                     foreach (var openGenericImplementation in handlerAssemblies.SelectMany(assembly => assembly.ExportedTypes)
                         .Where(type => type.IsConcrete() && type.IsOpenGeneric() && type.FindGenericInterfaces(openGenericInterface).Any()))
