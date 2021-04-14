@@ -14,7 +14,7 @@ namespace Developist.Core.Cqrs
     public interface IQueryHandlerWrapper<in TQuery, TResult> : ISortable where TQuery : IQuery<TResult>
     {
         /// <summary>
-        /// Performs any supplemental work before and/or after query handling.
+        /// Performs any supplemental work before and/or after the query is handled.
         /// </summary>
         /// <param name="query">The query to handle.</param>
         /// <param name="next">An awaitable delegate representing the call to the next wrapper or, eventually the handler.</param>
