@@ -3,6 +3,9 @@
 
 namespace Developist.Core.Cqrs
 {
+    /// <summary>
+    /// Defines a class that can dispatch instances of all the message types.
+    /// </summary>
     public interface IDispatcher : ICommandDispatcher, IQueryDispatcher, IEventDispatcher
     {
     }

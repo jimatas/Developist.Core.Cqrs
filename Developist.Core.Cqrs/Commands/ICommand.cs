@@ -3,6 +3,10 @@
 
 namespace Developist.Core.Cqrs
 {
+    /// <summary>
+    /// Marker interface for a command.
+    /// A command is an instruction that changes the system's state. It does not return a result.
+    /// </summary>
     public interface ICommand
     {
     }

@@ -11,6 +11,14 @@ namespace Developist.Core.Cqrs
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Registers the default dispatcher as well as all the custom handlers and wrappers in the provided assemblies with the built-in dependency injection container.
+        /// </summary>
+        /// <param name="services">The dependency injection container.</param>
+        /// <param name="dispatcherLifetime">The lifetime to register the dispatcher with.</param>
+        /// <param name="handlerLifetime">The lifetime to register the handlers and wrappers with.</param>
+        /// <param name="handlerAssemblies">One or more assemblies in which the custom handlers and wrappers are defined. Will default to the calling assembly, if none are provided.</param>
+        /// <returns>The dependency injection container.</returns>
         public static IServiceCollection AddCqrs(this IServiceCollection services,
             ServiceLifetime dispatcherLifetime = ServiceLifetime.Scoped,
             ServiceLifetime handlerLifetime = ServiceLifetime.Scoped,
