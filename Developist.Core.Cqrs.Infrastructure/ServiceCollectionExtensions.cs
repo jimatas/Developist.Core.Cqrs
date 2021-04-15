@@ -83,6 +83,12 @@ namespace Developist.Core.Cqrs
             }
         }
 
+        /// <summary>
+        /// Scans the specified assemblies for types to register with the dependency injection container.
+        /// </summary>
+        /// <param name="services">The depdencency injection container.</param>
+        /// <param name="assemblies">One or more assemblies to scan for types in.</param>
+        /// <returns></returns>
         internal static AssemblySelector FromAssemblies(this IServiceCollection services, IEnumerable<Assembly> assemblies) => new(services, assemblies);
     }
 }
