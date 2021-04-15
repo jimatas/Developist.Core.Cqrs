@@ -17,7 +17,7 @@ namespace Developist.Core.Cqrs
         /// Performs any supplemental work before and/or after the query is handled.
         /// </summary>
         /// <param name="query">The query to handle.</param>
-        /// <param name="next">An awaitable delegate representing the call to the next wrapper or, eventually the handler.</param>
+        /// <param name="next">An awaitable delegate representing the call to the next wrapper, or eventually the handler.</param>
         /// <param name="cancellationToken">The cancellation token to observe.</param>
         /// <returns>An awaitable task representing the asynchronous operation. The task result will contain the query result.</returns>
         Task<TResult> HandleAsync(TQuery query, HandlerDelegate<TResult> next, CancellationToken cancellationToken);
