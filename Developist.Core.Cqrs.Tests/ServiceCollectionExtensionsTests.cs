@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
+using System.Collections.Generic;
 
 namespace Developist.Core.Cqrs.Tests
 {
@@ -22,7 +23,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_CalledOnCurrentAssembly_RegistersDispatchers()
+        public void AddCqrs_ByDefault_RegistersDispatchers()
         {
             // Arrange
 
@@ -40,7 +41,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_CalledOnCurrentAssembly_RegistersDispatcherSuperTypesAsSelf()
+        public void AddCqrs_ByDefault_RegistersDispatcherSuperTypesAsSelf()
         {
             // Arrange
 
@@ -54,6 +55,18 @@ namespace Developist.Core.Cqrs.Tests
             Assert.AreEqual(dispatcher, commandDispatcher);
             Assert.AreEqual(dispatcher, queryDispatcher);
             Assert.AreEqual(dispatcher, eventDispatcher);
+        }
+
+        [TestMethod]
+        public void AddCqrs_ByDefault_RegistersCommandHandlers()
+        {
+            // Arrange
+
+            // Act
+            var commandHandler = serviceProvider.GetService<ICommandHandler<CreateMessage>>();
+
+            // Assert
+            Assert.IsNotNull(commandHandler);
         }
     }
 }

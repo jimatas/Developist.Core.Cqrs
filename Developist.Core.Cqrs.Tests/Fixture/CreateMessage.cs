@@ -5,14 +5,9 @@ using System;
 
 namespace Developist.Core.Cqrs.Tests
 {
-    public class Message
+    public class CreateMessage : ICommand
     {
-        public Message() { }
-        public Message(Guid id) => Id = id;
-
-        public Guid Id { get; }
+        public Guid Id { get; set; }
         public string Text { get; set; }
-
-        public override string ToString() => Text;
     }
 }
