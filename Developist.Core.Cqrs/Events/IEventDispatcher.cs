@@ -18,6 +18,6 @@ namespace Developist.Core.Cqrs
         /// <param name="event">The event to dispatch.</param>
         /// <param name="cancellationToken">The cancellation token to observe.</param>
         /// <returns>An awaitable task representing the asynchronous operation.</returns>
-        Task DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken) where TEvent : IEvent;
+        Task DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default) where TEvent : IEvent;
     }
 }

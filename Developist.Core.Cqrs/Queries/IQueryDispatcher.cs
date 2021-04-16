@@ -18,6 +18,6 @@ namespace Developist.Core.Cqrs
         /// <param name="query">The query to dispatch.</param>
         /// <param name="cancellationToken">The cancellation token to observe.</param>
         /// <returns>An awaitable task representing the asynchronous operation. The task result will contain the query result.</returns>
-        Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken);
+        Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
     }
 }
