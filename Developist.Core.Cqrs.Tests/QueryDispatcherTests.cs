@@ -3,10 +3,9 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Tests
@@ -38,10 +37,50 @@ namespace Developist.Core.Cqrs.Tests
             GetMessageById nullQuery = null;
 
             // Act
-            Func<Task<Message>> action = async () => await queryDispatcher.DispatchAsync(nullQuery).ConfigureAwait(false);
+            async Task<Message> action() => await queryDispatcher.DispatchAsync(nullQuery).ConfigureAwait(false);
 
             // Assert
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action).ConfigureAwait(false);
+        }
+
+        [TestMethod]
+        public async Task DispatchAsync_GivenGetMessageById_ReturnsMessage()
+        {
+            // Arrange
+            var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+
+            var messageId = Guid.NewGuid();
+            const string messageText = "Hello world";
+
+            database.Add(messageId, new Message(messageId) { Text = messageText });
+
+            // Act
+            var message = await queryDispatcher.DispatchAsync(new GetMessageById { Id = messageId }).ConfigureAwait(false);
+
+            // Assert
+            Assert.AreEqual(messageText, message.Text);
+        }
+
+        [TestMethod]
+        public async Task DispatchAsync_GivenGetMessageById_RunsWrappers()
+        {
+            // Arrange
+            var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+
+            var messageId = Guid.NewGuid();
+            const string messageText = "Hello world";
+
+            database.Add(messageId, new Message(messageId) { Text = messageText });
+
+            // Act
+            _ = await queryDispatcher.DispatchAsync(new GetMessageById { Id = messageId }).ConfigureAwait(false);
+
+            // Assert
+            var queue = new Queue<string>(output);
+
+            Assert.AreEqual($"{nameof(GetMessageByIdHandlerWrapper)}.{nameof(GetMessageByIdHandlerWrapper.HandleAsync)}_Before", queue.Dequeue());
+            Assert.AreEqual($"{nameof(GetMessageByIdHandler)}.{nameof(GetMessageByIdHandler.HandleAsync)}", queue.Dequeue());
+            Assert.AreEqual($"{nameof(GetMessageByIdHandlerWrapper)}.{nameof(GetMessageByIdHandlerWrapper.HandleAsync)}_After", queue.Dequeue());
         }
     }
 }
