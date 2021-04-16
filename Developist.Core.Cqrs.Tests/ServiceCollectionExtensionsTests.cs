@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Developist.Core.Cqrs.Tests
 {
@@ -71,10 +72,12 @@ namespace Developist.Core.Cqrs.Tests
             // Act
             var commandHandler = serviceProvider.GetService<ICommandHandler<CreateMessage>>();
             var queryHandler = serviceProvider.GetService<IQueryHandler<GetMessageById, Message>>();
+            var eventHandlers = serviceProvider.GetServices<IEventHandler<MessageCreated>>();
 
             // Assert
             Assert.IsNotNull(commandHandler);
             Assert.IsNotNull(queryHandler);
+            Assert.IsTrue(eventHandlers.Any());
         }
 
         [TestMethod]
@@ -83,12 +86,12 @@ namespace Developist.Core.Cqrs.Tests
             // Arrange
 
             // Act
-            var commandHandlerWrapper = serviceProvider.GetService<ICommandHandlerWrapper<CreateMessage>>();
-            var queryHandlerWrapper = serviceProvider.GetService<IQueryHandlerWrapper<GetMessageById, Message>>();
+            var commandHandlerWrappers = serviceProvider.GetServices<ICommandHandlerWrapper<CreateMessage>>();
+            var queryHandlerWrappers = serviceProvider.GetServices<IQueryHandlerWrapper<GetMessageById, Message>>();
 
             // Assert
-            Assert.IsNotNull(commandHandlerWrapper);
-            Assert.IsNotNull(queryHandlerWrapper);
+            Assert.IsTrue(commandHandlerWrappers.Any());
+            Assert.IsTrue(queryHandlerWrappers.Any());
         }
     }
 }
