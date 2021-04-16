@@ -17,6 +17,10 @@ using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs
 {
+    /// <summary>
+    /// Default implementation of the <see cref="IDispatcher"/> interface. 
+    /// Uses the built-in dependency injection container to resolve handlers.
+    /// </summary>
     public class Dispatcher : IDispatcher
     {
         private readonly IServiceProvider serviceProvider;

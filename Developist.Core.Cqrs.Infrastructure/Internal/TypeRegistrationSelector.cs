@@ -19,6 +19,11 @@ namespace Developist.Core.Cqrs
             this.typeRegistrations = typeRegistrations ?? throw new ArgumentNullException(nameof(typeRegistrations));
         }
 
+        /// <summary>
+        /// Registers each type as a dependency with the specified lifetime.
+        /// </summary>
+        /// <param name="lifetime">The lifetime to register the types with.</param>
+        /// <returns></returns>
         public IServiceCollection WithLifetime(ServiceLifetime lifetime)
         {
             foreach ((var service, var implementations) in typeRegistrations)

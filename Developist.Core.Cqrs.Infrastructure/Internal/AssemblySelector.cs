@@ -21,6 +21,11 @@ namespace Developist.Core.Cqrs
             this.assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
         }
 
+        /// <summary>
+        /// Adds all publicly accessible non-generic concrete classes from the assembly.
+        /// </summary>
+        /// <param name="predicate">An optional condition to filter the types in the assembly by.</param>
+        /// <returns></returns>
         public TypeSelector AddClasses(Func<Type, bool> predicate = null)
         {
             var types = assemblies.SelectMany(assembly => assembly.ExportedTypes)

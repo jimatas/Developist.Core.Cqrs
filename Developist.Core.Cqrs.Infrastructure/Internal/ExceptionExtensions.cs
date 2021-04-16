@@ -8,6 +8,12 @@ namespace Developist.Core.Cqrs
 {
     internal static class ExceptionExtensions
     {
+        /// <summary>
+        /// Returns a detailed description of the exception that occurred.
+        /// </summary>
+        /// <param name="exception">The exception for which to return a detail message.</param>
+        /// <param name="includeInnerExceptions">If <see langword="true"/>, will include the details of any inner exceptions.</param>
+        /// <returns>A string detailing the exception, including its stack trace information.</returns>
         public static string DetailMessage(this Exception exception, bool includeInnerExceptions = true)
         {
             var detailMessageBuilder = new StringBuilder(exception.BuildDetailMessage());

@@ -11,6 +11,14 @@ namespace Developist.Core.Cqrs
 {
     public static class ServiceCollectionExtensions
     {
+        /// <summary>
+        /// Registers the default dispatcher as well as all the custom handlers and wrappers in the provided assemblies with the built-in dependency injection container.
+        /// </summary>
+        /// <param name="services">The dependency injection container.</param>
+        /// <param name="dispatcherLifetime">The lifetime to register the dispatcher with.</param>
+        /// <param name="handlerLifetime">The lifetime to register the handlers and wrappers with.</param>
+        /// <param name="handlerAssemblies">One or more assemblies in which the custom handlers and wrappers are defined. Will default to the calling assembly, if none are provided.</param>
+        /// <returns>The dependency injection container.</returns>
         public static IServiceCollection AddCqrs(this IServiceCollection services,
             ServiceLifetime dispatcherLifetime = ServiceLifetime.Scoped,
             ServiceLifetime handlerLifetime = ServiceLifetime.Scoped,
@@ -52,7 +60,7 @@ namespace Developist.Core.Cqrs
 
             void AddOpenGenericHandlers()
             {
-                foreach (var openGenericInterface in new[] { typeof(ICommandHandler<>), typeof(IQueryHandler<,>) })
+                foreach (var openGenericInterface in new[] { typeof(ICommandHandler<>), typeof(IQueryHandler<,>), typeof(IEventHandler<>) })
                 {
                     foreach (var openGenericImplementation in handlerAssemblies.SelectMany(assembly => assembly.ExportedTypes)
                         .Where(type => type.IsConcrete() && type.IsOpenGeneric() && type.FindGenericInterfaces(openGenericInterface).Any()))
@@ -75,6 +83,12 @@ namespace Developist.Core.Cqrs
             }
         }
 
+        /// <summary>
+        /// Scans the specified assemblies for types to register with the dependency injection container.
+        /// </summary>
+        /// <param name="services">The depdencency injection container.</param>
+        /// <param name="assemblies">One or more assemblies to scan for types in.</param>
+        /// <returns></returns>
         internal static AssemblySelector FromAssemblies(this IServiceCollection services, IEnumerable<Assembly> assemblies) => new(services, assemblies);
     }
 }

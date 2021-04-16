@@ -21,6 +21,10 @@ namespace Developist.Core.Cqrs
             this.types = types ?? throw new ArgumentNullException(nameof(types));
         }
 
+        /// <summary>
+        /// Registers each type as all of its public implemented interfaces, except for IDisposable and IAsyncDisposable.
+        /// </summary>
+        /// <returns></returns>
         public TypeRegistrationSelector AsImplementedInterfaces()
         {
             foreach (var type in types)

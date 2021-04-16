@@ -10,6 +10,13 @@ namespace Developist.Core.Cqrs
 {
     public static class EventDispatcherExtensions
     {
+        /// <summary>
+        /// Disptaches a sequence of events to multiple handlers for handling.
+        /// </summary>
+        /// <param name="dispatcher">The dispatcher to dispatch from.</param>
+        /// <param name="events">The events to dispatach.</param>
+        /// <param name="cancellationToken">The cancellation token to observe.</param>
+        /// <returns>An awaitable task representing the asynchronous operation.</returns>
         public static async Task DispatchAllAsync(this IEventDispatcher dispatcher, IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
         {
             if (events is null)
