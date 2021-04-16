@@ -5,7 +5,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
-using System.Collections.Generic;
 
 namespace Developist.Core.Cqrs.Tests
 {
@@ -67,6 +66,18 @@ namespace Developist.Core.Cqrs.Tests
 
             // Assert
             Assert.IsNotNull(commandHandler);
+        }
+
+        [TestMethod]
+        public void AddCqrs_ByDefault_RegistersCommandHandlerWrappers()
+        {
+            // Arrange
+
+            // Act
+            var commandHandlerWrapper = serviceProvider.GetService<ICommandHandlerWrapper<CreateMessage>>();
+
+            // Assert
+            Assert.IsNotNull(commandHandlerWrapper);
         }
     }
 }
