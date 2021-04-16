@@ -16,6 +16,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Developist.Core.Cqrs.Infras
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Developist.Core.Cqrs.Tests", "Developist.Core.Cqrs.Tests\Developist.Core.Cqrs.Tests.csproj", "{3DCEA472-CD4A-4835-A9B8-C22F999F5BDE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sources", "Sources", "{18A3B900-B9E0-46EF-ACB9-2AA16D0FF092}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{9948E5AA-8579-4C67-90D3-5E2E12AC1449}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,6 +41,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{36ACD9B9-BF08-47AD-9B7C-755672A8758A} = {18A3B900-B9E0-46EF-ACB9-2AA16D0FF092}
+		{06CF291E-B7F8-429D-B967-47ADF4E66794} = {18A3B900-B9E0-46EF-ACB9-2AA16D0FF092}
+		{3DCEA472-CD4A-4835-A9B8-C22F999F5BDE} = {9948E5AA-8579-4C67-90D3-5E2E12AC1449}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {E8CBA2C0-5B9C-432B-8995-6DF79061A68F}
