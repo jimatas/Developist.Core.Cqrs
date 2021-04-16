@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Tests.Fixture
+namespace Developist.Core.Cqrs.Tests
 {
     public class CreateMessageHandlerWrapper : ICommandHandlerWrapper<CreateMessage>
     {
@@ -19,12 +19,15 @@ namespace Developist.Core.Cqrs.Tests.Fixture
         public Task HandleAsync(CreateMessage command, HandlerDelegate next, CancellationToken cancellationToken)
         {
             output.Add($"{nameof(CreateMessageHandlerWrapper)}.{nameof(HandleAsync)}_Before");
-
+            
             var taskResult = next();
-
+            
             output.Add($"{nameof(CreateMessageHandlerWrapper)}.{nameof(HandleAsync)}_After");
 
             return taskResult;
         }
+
+        // Highest sort order value in the execution pipeline, runs last.
+        int ISortable.SortOrder => 30;
     }
 }

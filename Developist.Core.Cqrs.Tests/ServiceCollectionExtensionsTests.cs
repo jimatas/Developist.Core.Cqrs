@@ -5,19 +5,26 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
+using System.Collections.Generic;
 
 namespace Developist.Core.Cqrs.Tests
 {
     [TestClass]
     public class ServiceCollectionExtensionsTests
     {
+        private readonly Dictionary<Guid, Message> database = new();
+        private readonly List<string> output = new();
+
         private IServiceProvider serviceProvider;
 
         [TestInitialize]
         public void Initialize()
         {
-            var services = new ServiceCollection();
-            services.AddCqrs();
+            var services = new ServiceCollection()
+                .AddScoped<IDictionary<Guid, Message>>(_ => database)
+                .AddScoped<IList<string>>(_ => output)
+                .AddCqrs();
+
             serviceProvider = services.BuildServiceProvider();
         }
 
@@ -40,7 +47,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersDispatcherSuperTypesAsSelf()
+        public void AddCqrs_ByDefault_RegistersDispatcherParentInterfacesAsSelf()
         {
             // Arrange
 
@@ -57,27 +64,31 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersCommandHandlers()
+        public void AddCqrs_ByDefault_RegistersHandlers()
         {
             // Arrange
 
             // Act
             var commandHandler = serviceProvider.GetService<ICommandHandler<CreateMessage>>();
+            var queryHandler = serviceProvider.GetService<IQueryHandler<GetMessageById, Message>>();
 
             // Assert
             Assert.IsNotNull(commandHandler);
+            Assert.IsNotNull(queryHandler);
         }
 
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersCommandHandlerWrappers()
+        public void AddCqrs_ByDefault_RegistersWrappers()
         {
             // Arrange
 
             // Act
             var commandHandlerWrapper = serviceProvider.GetService<ICommandHandlerWrapper<CreateMessage>>();
+            var queryHandlerWrapper = serviceProvider.GetService<IQueryHandlerWrapper<GetMessageById, Message>>();
 
             // Assert
             Assert.IsNotNull(commandHandlerWrapper);
+            Assert.IsNotNull(queryHandlerWrapper);
         }
     }
 }

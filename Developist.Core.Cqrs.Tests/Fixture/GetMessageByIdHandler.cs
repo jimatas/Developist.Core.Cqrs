@@ -8,25 +8,23 @@ using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Tests
 {
-    public class CreateMessageHandler : ICommandHandler<CreateMessage>
+    public class GetMessageByIdHandler : IQueryHandler<GetMessageById, Message>
     {
         private readonly IDictionary<Guid, Message> database;
         private readonly IList<string> output;
 
-        public CreateMessageHandler(IDictionary<Guid, Message> database, IList<string> output = null)
+        public GetMessageByIdHandler(IDictionary<Guid, Message> database, IList<string> output = null)
         {
             this.database = database;
             this.output = output ?? new List<string>();
         }
 
-        public Task HandleAsync(CreateMessage command, CancellationToken cancellationToken)
+        public Task<Message> HandleAsync(GetMessageById query, CancellationToken cancellationToken)
         {
-            var newMessage = new Message(command.Id) { Text = command.Text };
-            database.Add(newMessage.Id, newMessage);
+            output.Add($"{nameof(GetMessageByIdHandler)}.{nameof(HandleAsync)}");
 
-            output.Add($"{nameof(CreateMessageHandler)}.{nameof(HandleAsync)}");
-
-            return Task.CompletedTask;
+            database.TryGetValue(query.Id, out Message message);
+            return Task.FromResult(message);
         }
     }
 }
