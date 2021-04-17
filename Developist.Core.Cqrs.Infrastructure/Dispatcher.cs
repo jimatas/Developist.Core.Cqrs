@@ -8,7 +8,6 @@ using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
@@ -26,16 +25,12 @@ namespace Developist.Core.Cqrs
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger logger;
 
-        #region Constructors
-        public Dispatcher(IServiceProvider serviceProvider) : this(serviceProvider, logger: null) { }
-        public Dispatcher(IServiceProvider serviceProvider, ILogger<Dispatcher> logger)
+        public Dispatcher(IServiceProvider serviceProvider, ILogger<Dispatcher> logger = null)
         {
             this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
             this.logger = logger ?? serviceProvider.GetService<ILogger<Dispatcher>>() ?? NullLogger<Dispatcher>.Instance;
         }
-        #endregion
-
-        [DebuggerStepThrough]
+        
         async Task ICommandDispatcher.DispatchAsync<TCommand>(TCommand command, CancellationToken cancellationToken)
         {
             if (command is null)
@@ -68,7 +63,6 @@ namespace Developist.Core.Cqrs
             HandlerDelegate Pipe(HandlerDelegate next, ICommandHandlerWrapper<TCommand> wrapper) => () => wrapper.HandleAsync(command, next, cancellationToken);
         }
 
-        [DebuggerStepThrough]
         async Task<TResult> IQueryDispatcher.DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken)
         {
             if (query is null)
@@ -101,7 +95,6 @@ namespace Developist.Core.Cqrs
             HandlerDelegate<TResult> Pipe(object next, object wrapper) => () => wrappers.InvokeAsync(wrapper, query, next, cancellationToken);
         }
 
-        [DebuggerStepThrough]
         async Task IEventDispatcher.DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken)
         {
             if (@event is null)
@@ -109,21 +102,21 @@ namespace Developist.Core.Cqrs
                 throw new ArgumentNullException(nameof(@event));
             }
 
-            ICollection<Exception> exceptions = null;
             var handlers = serviceProvider.GetServices<IEventHandler<TEvent>>();
+            var task = Task.WhenAll(handlers.Select(HandleAsyncReturnException));
             try
             {
-                await Task.WhenAll(handlers.Select(HandleAsyncWithException)).ConfigureAwait(false);
+                await task.ConfigureAwait(false);
             }
             catch
             {
-                if (exceptions is not null)
+                if (task.Exception is not null)
                 {
-                    throw new AggregateException(exceptions);
+                    throw task.Exception;
                 }
             }
 
-            Task HandleAsyncWithException(IEventHandler<TEvent> handler)
+            Task HandleAsyncReturnException(IEventHandler<TEvent> handler)
             {
                 try
                 {
@@ -132,8 +125,6 @@ namespace Developist.Core.Cqrs
                 catch (Exception exception)
                 {
                     logger.LogWarning(exception, "Exception thrown during event dispatch: {ExceptionDetailMessage}", exception.DetailMessage(true));
-                    (exceptions ??= new List<Exception>()).Add(exception);
-
                     return Task.FromException(exception);
                 }
             }
@@ -154,7 +145,6 @@ namespace Developist.Core.Cqrs
                 handleMethod = handlerType.GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.HandleAsync), bindingAttr);
             }
 
-            [DebuggerStepThrough]
             public Task<TResult> InvokeAsync(object query, object cancellationToken)
             {
                 try
@@ -186,7 +176,6 @@ namespace Developist.Core.Cqrs
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
             public IEnumerator<object> GetEnumerator() => wrapperInstances.GetEnumerator();
 
-            [DebuggerStepThrough]
             public Task<TResult> InvokeAsync(object wrapperInstance, object query, object next, object cancellationToken)
             {
                 try
