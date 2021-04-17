@@ -25,7 +25,6 @@ namespace Developist.Core.Cqrs.Samples.Common.Caching
             this.logger = logger;
         }
 
-        /// <inheritdoc/>
         public async Task<TResult> HandleAsync(TQuery query, HandlerDelegate<TResult> next, CancellationToken cancellationToken)
         {
             if (memoryCache.TryGetValue<TResult>(query.CacheKey, out var result))

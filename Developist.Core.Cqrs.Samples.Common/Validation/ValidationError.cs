@@ -8,7 +8,6 @@ namespace Developist.Core.Cqrs.Samples.Common.Validation
     /// </summary>
     public record ValidationError(string Message, params object[] MessageParameters)
     {
-        /// <inheritdoc/>
         public override string ToString() => string.Format(Message, MessageParameters);
     }
 }
