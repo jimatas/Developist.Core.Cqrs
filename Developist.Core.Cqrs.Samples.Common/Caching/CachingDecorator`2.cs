@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Developist.Core.Cqrs.Samples.Common.Caching
 {
     /// <summary>
-    /// Adds caching behavior to the processing pipeline for queries that support it.
+    /// Adds caching behavior to the query processing pipeline for queries that support it.
     /// </summary>
     /// <typeparam name="TQuery">The type of the query whose result can be cached.</typeparam>
     /// <typeparam name="TResult">The type of the query result.</typeparam>
