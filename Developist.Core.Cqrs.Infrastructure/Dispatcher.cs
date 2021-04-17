@@ -114,6 +114,7 @@ namespace Developist.Core.Cqrs
                 {
                     throw task.Exception;
                 }
+                throw;
             }
 
             Task HandleAsyncReturnException(IEventHandler<TEvent> handler)
