@@ -1,5 +1,5 @@
 # Developist.Core.Cqrs
-Splits the application's use-case processing layer into components that fit into one of two categories: _commands_ or _queries_. This library also adds the closely linked but separate _events_ to these two categories.
+Splits the application's use-case processing layer into components that fit into one of two categories: _commands_ or _queries_. This library also adds the closely linked but separate _events_ (aka _notifications_) to these two categories.
 
 Define your commands by inheriting from the `ICommand` interface; your queries by inheriting from the `IQuery<TResult>` interface; and your events by inheriting from the `IEvent` interface. These marker interfaces are meant to enable the automatic wire-up of messages with handlers by the dispatcher.
 
