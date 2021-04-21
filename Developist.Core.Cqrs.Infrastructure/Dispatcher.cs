@@ -110,6 +110,8 @@ namespace Developist.Core.Cqrs
             }
             catch
             {
+                // The await in the try block will cause a possible AggregateException to be unwrapped and the first exception in its InnerExceptions property to be thrown instead.
+                // Since that's hardly useful, catch that unwrapped exception and attempt to throw the original AggregateException here, which is still available through the task's Exception property.
                 if (task.Exception is not null)
                 {
                     throw task.Exception;
