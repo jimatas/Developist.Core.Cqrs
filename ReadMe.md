@@ -31,26 +31,46 @@ public class CreateUserAccountHandler : ICommandHandler<CreateUserAccount>
 }
 ```
 
+Similarly, a query and its handler to retrieve the accounts created by the previous command can be defined in the following manner.
+
+```csharp
+public class GetUserAccount : IQuery<UserAccount> // Will only ever match a single user account, or none.
+{
+    public string UserName { get; set; }
+    public string Email { get; set; }
+}
+
+public class GetUserAccountHandler : IQueryHandler<GetUserAccount, UserAccount>
+{
+    public async Task<UserAccount> HandleAsync(GetUserAccount query)
+    {
+        // Retrieve the account identified by the username and/or email supplied in the query.
+        // Again, possibly by using any services that have been injected through the constructor.
+    }
+}
+```
+
 After registering the dependencies in the `ConfigureServices` method of your `Startup.cs`, you can start using them in your code through regular constructor injection.
 
 ```csharp
-// Registers the dependencies, scanning the calling assembly
-// for handlers to automatically register.
+// Scans the calling assembly for handlers to automatically register.
 services.AddCqrs();
 ```
 The `AddCqrs` method accepts the lifetimes that the dispatcher and the handlers will be registered with as optional parameters. Both of these parameters default to `ServiceLifetime.Scoped` when not otherwise specified. It also accepts a `params` array of `Assembly` objects denoting the assemblies in which your handlers and wrappers are defined. If no assemblies are specified, it will default to the assembly from which the method is being called.
 
-The following example shows a sample consumer using the `ICommandDispatcher` dependency.
+The following example shows a sample consumer using the `ICommandDispatcher` and `IQueryDispatcher` dependencies.
 
 ```csharp
-public AccountController(ICommandDispatcher dispatcher)
+// Note, you could also just pass in a single IDispatcher instance.
+public AccountController(ICommandDispatcher commands, IQueryDispatcher queries)
 {
-    this.dispatcher = dispatcher;
+    this.commands = commands;
+    this.queries = queries;
 }
 
 public async Task<ActionResult> SignUpAsync(string userName, string email, string password)
 {
-    await dispatcher.DispatchAsync(new CreateUserAccount
+    await commands.DispatchAsync(new CreateUserAccount
     { 
        UserName = userName,
        Email = email,
@@ -58,6 +78,16 @@ public async Task<ActionResult> SignUpAsync(string userName, string email, strin
     });
     
     // return Success ActionResult..
+}
+
+public async Task<ActionResult<UserAccount>> LookupAsync(string userName)
+{
+    var account = await queries.DispatchAsync(new GetUserAccount 
+    {
+        UserName = userName
+    });
+    
+    // return the appropriate ActionResult, NotFound, ...
 }
 ```
 ## Further examples
