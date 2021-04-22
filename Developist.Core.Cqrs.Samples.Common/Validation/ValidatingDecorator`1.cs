@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 namespace Developist.Core.Cqrs.Samples.Common.Validation
 {
     /// <summary>
-    /// Adds validation behavior to the command handling pipeline.
+    /// Adds validation behavior to the command processing pipeline.
     /// </summary>
     /// <typeparam name="TCommand">The type of command to validate.</typeparam>
     public class ValidatingDecorator<TCommand> : ICommandHandlerWrapper<TCommand> where TCommand : ICommand
