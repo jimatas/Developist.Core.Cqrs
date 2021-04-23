@@ -105,7 +105,7 @@ public class EnsureUniqueEmail : ICommandHandlerWrapper<CreateUserAccount>
     
     public async Task HandleAsync(CreateUserAccount command, HandlerDelegate next, CancellationToken cancellationToken)
     {
-        if (Exists(command.Email))
+        if (await ExistsAsync(command.Email, cancellationToken))
         {
             throw new EmailAlreadyRegisteredException(command.Email);
         }
@@ -113,9 +113,9 @@ public class EnsureUniqueEmail : ICommandHandlerWrapper<CreateUserAccount>
         await next();
     }
     
-    private bool Exists(string email)
+    private async Task<bool> ExistsAsync(string email, CancellationToken cancellationToken)
     {
-        return repository.Find(ua => ua.Email.Equals(email)).Any();
+        return (await repository.FindAsync(ua => ua.Email.Equals(email), cancellationToken)).Any();
     }
 }
 ```
