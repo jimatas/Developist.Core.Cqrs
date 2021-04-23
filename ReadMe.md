@@ -90,5 +90,36 @@ public async Task<ActionResult<UserAccount>> LookupAsync(string userName)
     // return the appropriate ActionResult, NotFound, ...
 }
 ```
+## Sample decorator
+To ensure that the email address of the account to create has not yet been registered, something along the lines of the following decorator can be defined.
+
+```csharp
+public class EnsureUniqueEmail : ICommandHandlerWrapper<CreateUserAccount>
+{
+    private readonly IRepository<UserAccount> repository;
+    
+    public EnsureUniqueEmail(IRepository<UserAccount> repository)
+    {
+        this.repository = repository;
+    }
+    
+    public async Task HandleAsync(CreateUserAccount command, HandlerDelegate next, CancellationToken cancellationToken)
+    {
+        if (Exists(command.Email))
+        {
+            throw new EmailAlreadyRegisteredException();
+        }
+        
+        await next();
+    }
+    
+    private bool Exists(string email)
+    {
+        return repository.Find(ua => ua.Email.Equals(email)).Any();
+    }
+}
+```
+Note that the `EnsureUniqueEmail` class above provides a full example, with an injected `IRepository<TEntity>` dependency. Just like the handlers, any wrappers wil also be automatically resolved by the dispatcher, including any of their dependencies.
+
 ## Further examples
 Please see the unit tests and samples projects inside the solution for more examples and usage patterns.
