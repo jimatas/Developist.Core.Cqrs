@@ -90,7 +90,7 @@ public async Task<ActionResult<UserAccount>> LookupAsync(string userName)
     // return the appropriate ActionResult, NotFound, ...
 }
 ```
-## Sample decorator
+### Sample decorator
 To ensure that the email address of the account to create has not yet been registered, something along the lines of the following decorator can be defined.
 
 ```csharp
