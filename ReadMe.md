@@ -23,7 +23,7 @@ public class CreateUserAccount : ICommand
 
 public class CreateUserAccountHandler : ICommandHandler<CreateUserAccount>
 {
-    public async Task HandleAsync(CreateUserAccount command)
+    public async Task HandleAsync(CreateUserAccount command, CancellationToken cancellationToken)
     {
         // Create a new account given the username, email and password supplied in 
         // the command and store it, possibly using an injected repository.
@@ -42,7 +42,7 @@ public class GetUserAccount : IQuery<UserAccount> // Will only ever match a sing
 
 public class GetUserAccountHandler : IQueryHandler<GetUserAccount, UserAccount>
 {
-    public async Task<UserAccount> HandleAsync(GetUserAccount query)
+    public async Task<UserAccount> HandleAsync(GetUserAccount query, CancellationToken cancellationToken)
     {
         // Retrieve the account identified by the username and/or email supplied in the query.
         // Again, possibly by using any services that have been injected through the constructor.
