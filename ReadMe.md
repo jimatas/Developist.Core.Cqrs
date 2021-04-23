@@ -119,7 +119,7 @@ public class EnsureUniqueEmail : ICommandHandlerWrapper<CreateUserAccount>
     }
 }
 ```
-Note that the `EnsureUniqueEmail` class above provides a full example, with an injected `IRepository<TEntity>` dependency. Just like the handlers, any wrappers wil also be automatically resolved by the dispatcher, including any of their dependencies.
+Note that the `EnsureUniqueEmail` class above provides a full example, with an injected [`IRepository<TEntity>`](https://github.com/jimatas/Developist.Core.Persistence) dependency. Just like the handlers, any wrappers wil also be automatically resolved by the dispatcher, including any of their dependencies.
 
 ## Further examples
 Please see the unit tests and samples projects inside the solution for more examples and usage patterns.
