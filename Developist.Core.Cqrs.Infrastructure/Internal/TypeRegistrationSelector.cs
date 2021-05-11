@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Utilities;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using System;
@@ -15,8 +17,8 @@ namespace Developist.Core.Cqrs
 
         public TypeRegistrationSelector(IServiceCollection services, IDictionary<Type, ICollection<Type>> typeRegistrations)
         {
-            this.services = services ?? throw new ArgumentNullException(nameof(services));
-            this.typeRegistrations = typeRegistrations ?? throw new ArgumentNullException(nameof(typeRegistrations));
+            this.services = Ensure.Argument.NotNull(services, nameof(services));
+            this.typeRegistrations = Ensure.Argument.NotNull(typeRegistrations, nameof(typeRegistrations));
         }
 
         /// <summary>

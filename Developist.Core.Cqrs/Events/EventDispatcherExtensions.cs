@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Utilities;
+
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -19,10 +21,7 @@ namespace Developist.Core.Cqrs
         /// <returns>An awaitable task representing the asynchronous operation.</returns>
         public static async Task DispatchAllAsync(this IEventDispatcher dispatcher, IEnumerable<IEvent> events, CancellationToken cancellationToken = default)
         {
-            if (events is null)
-            {
-                throw new ArgumentNullException(nameof(events));
-            }
+            Ensure.Argument.NotNull(events, nameof(events));
 
             ICollection<Exception> exceptions = null;
 

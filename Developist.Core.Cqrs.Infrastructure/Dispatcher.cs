@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Utilities;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -27,16 +29,13 @@ namespace Developist.Core.Cqrs
 
         public Dispatcher(IServiceProvider serviceProvider, ILogger<Dispatcher> logger = null)
         {
-            this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            this.serviceProvider = Ensure.Argument.NotNull(serviceProvider, nameof(serviceProvider));
             this.logger = logger ?? serviceProvider.GetService<ILogger<Dispatcher>>() ?? NullLogger<Dispatcher>.Instance;
         }
         
         async Task ICommandDispatcher.DispatchAsync<TCommand>(TCommand command, CancellationToken cancellationToken)
         {
-            if (command is null)
-            {
-                throw new ArgumentNullException(nameof(command));
-            }
+            Ensure.Argument.NotNull(command, nameof(command));
 
             var handler = serviceProvider.GetRequiredService<ICommandHandler<TCommand>>();
             var wrappers = serviceProvider.GetServices<ICommandHandlerWrapper<TCommand>>();
@@ -65,10 +64,7 @@ namespace Developist.Core.Cqrs
 
         async Task<TResult> IQueryDispatcher.DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken)
         {
-            if (query is null)
-            {
-                throw new ArgumentNullException(nameof(query));
-            }
+            Ensure.Argument.NotNull(query, nameof(query));
 
             var handler = new ReflectedQueryHandler<TResult>(query.GetType(), serviceProvider);
             var wrappers = new ReflectedQueryHandlerWrappers<TResult>(query.GetType(), serviceProvider);
@@ -97,10 +93,7 @@ namespace Developist.Core.Cqrs
 
         async Task IEventDispatcher.DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken)
         {
-            if (@event is null)
-            {
-                throw new ArgumentNullException(nameof(@event));
-            }
+            Ensure.Argument.NotNull(@event, nameof(@event));
 
             var handlers = serviceProvider.GetServices<IEventHandler<TEvent>>();
             var task = Task.WhenAll(handlers.Select(HandleAsyncReturnException));

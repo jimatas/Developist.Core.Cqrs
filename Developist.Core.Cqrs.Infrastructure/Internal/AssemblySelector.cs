@@ -1,6 +1,8 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Utilities;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using System;
@@ -17,8 +19,8 @@ namespace Developist.Core.Cqrs
 
         public AssemblySelector(IServiceCollection services, IEnumerable<Assembly> assemblies)
         {
-            this.services = services ?? throw new ArgumentNullException(nameof(services));
-            this.assemblies = assemblies ?? throw new ArgumentNullException(nameof(assemblies));
+            this.services = Ensure.Argument.NotNull(services, nameof(services));
+            this.assemblies = Ensure.Argument.NotNull(assemblies, nameof(assemblies));
         }
 
         /// <summary>
