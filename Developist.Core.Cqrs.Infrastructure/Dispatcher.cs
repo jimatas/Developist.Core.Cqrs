@@ -27,6 +27,11 @@ namespace Developist.Core.Cqrs
         private readonly IServiceProvider serviceProvider;
         private readonly ILogger logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dispatcher"/> class given the service provider to resolve the handlers with and the logger to write diagnostic messages with.
+        /// </summary>
+        /// <param name="serviceProvider">The service provider with which the handlers will be resolved.</param>
+        /// <param name="logger">The logger with which diagnostic messages will be logged.</param>
         public Dispatcher(IServiceProvider serviceProvider, ILogger<Dispatcher> logger = null)
         {
             this.serviceProvider = Ensure.Argument.NotNull(serviceProvider, nameof(serviceProvider));

@@ -10,12 +10,12 @@
     <NeutralLanguage>en</NeutralLanguage>
     <AssemblyVersion>1.0.$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays))).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</AssemblyVersion>
     <FileVersion>$(AssemblyVersion)</FileVersion>
-    <Version>1.0.0-beta</Version>
+    <Version>1.0.0</Version>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <Description>CQRS messaging library built around an in-process dispatcher. The messages dispatched are command, query and event. Supports wrapping of message handlers to create processing pipelines. Targets .NET 5.0.</Description>
-    <PackageTags>cqrs command query event message-dispatcher net5 beta prerelease</PackageTags>
+    <PackageTags>cqrs command query event message-dispatcher net5</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/jimatas/Developist.Core.Cqrs</PackageProjectUrl>
