@@ -1,16 +1,22 @@
 <Project>
   <PropertyGroup>
-    <Deterministic>true</Deterministic>
     <Product>Developist.Core.Cqrs</Product>
     <Authors>Jim Atas</Authors>
     <Company>Developist</Company>
     <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <NeutralLanguage>en</NeutralLanguage>
-    <AssemblyVersion>1.0.$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays))).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</AssemblyVersion>
-    <FileVersion>$(AssemblyVersion)</FileVersion>
     <Version>1.0.0</Version>
+    <Major>$(Version.Split('.')[0])</Major>
+    <Minor>$(Version.Split('.')[1])</Minor>
+    <Build>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</Build>
+    <Revision>$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</Revision>
+    <AssemblyVersion>$(Major).$(Minor).$(Build).$(Revision)</AssemblyVersion>
+    <FileVersion>$(AssemblyVersion)</FileVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <NeutralLanguage>en</NeutralLanguage>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
