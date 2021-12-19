@@ -1,11 +1,15 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Cqrs.DependencyInjection;
+using Developist.Core.Cqrs.Queries;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Tests
@@ -24,10 +28,14 @@ namespace Developist.Core.Cqrs.Tests
             var services = new ServiceCollection()
                 .AddScoped<IDictionary<Guid, Message>>(_ => database)
                 .AddScoped<IList<string>>(_ => output)
-                .AddCqrs();
+                .AddDispatcher()
+                .AddHandlersFromAssembly(Assembly.GetExecutingAssembly());
 
             serviceProvider = services.BuildServiceProvider();
         }
+
+        [TestCleanup]
+        public void CleanUp() => (serviceProvider as IDisposable)?.Dispose();
 
         [TestMethod]
         public async Task DispatchAsync_GivenNull_ThrowsArgumentNullException()

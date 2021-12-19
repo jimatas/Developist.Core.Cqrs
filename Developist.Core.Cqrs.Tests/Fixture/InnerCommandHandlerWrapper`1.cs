@@ -1,13 +1,16 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Cqrs.Commands;
+
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Tests
 {
-    public class InnerCommandHandlerWrapper<TCommand> : ICommandHandlerWrapper<TCommand> where TCommand : ICommand
+    public class InnerCommandHandlerWrapper<TCommand> : ICommandHandlerWrapper<TCommand>, IPrioritizable
+        where TCommand : ICommand
     {
         private readonly IList<string> output;
 
@@ -27,6 +30,6 @@ namespace Developist.Core.Cqrs.Tests
             return taskResult;
         }
 
-        int ISortable.SortOrder => 20;
+        public sbyte Priority => Priorities.Low;
     }
 }

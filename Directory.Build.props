@@ -6,7 +6,7 @@
     <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <Version>1.0.1</Version>
+    <Version>2.2.0</Version>
     <Major>$(Version.Split('.')[0])</Major>
     <Minor>$(Version.Split('.')[1])</Minor>
     <Build>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</Build>
@@ -17,11 +17,11 @@
   <PropertyGroup>
     <Deterministic>true</Deterministic>
     <NeutralLanguage>en</NeutralLanguage>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
-    <Description>CQRS messaging library built around an in-process dispatcher. The messages dispatched are command, query and event. Supports wrapping of message handlers to create processing pipelines. Targets .NET 5.0.</Description>
-    <PackageTags>cqrs command query event message-dispatcher net5</PackageTags>
+    <Description>CQRS messaging library built around an in-process mediator that can dispatch command, query and event messages. Supports wrapping of message handlers to create processing pipelines. Targets .NET Standard 2.0.</Description>
+    <PackageTags>cqrs;dispatcher;command;query;event;handler</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/jimatas/Developist.Core.Cqrs</PackageProjectUrl>

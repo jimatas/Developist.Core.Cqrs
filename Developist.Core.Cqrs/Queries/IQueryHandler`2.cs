@@ -4,21 +4,11 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs
+namespace Developist.Core.Cqrs.Queries
 {
-    /// <summary>
-    /// Defines the interface for a query handler.
-    /// </summary>
-    /// <typeparam name="TQuery">The type of query handled.</typeparam>
-    /// <typeparam name="TResult">The type of the query result.</typeparam>
-    public interface IQueryHandler<in TQuery, TResult> where TQuery : IQuery<TResult>
+    public interface IQueryHandler<in TQuery, TResult>
+        where TQuery : IQuery<TResult>
     {
-        /// <summary>
-        /// Handles the specified query and returns the result it produced.
-        /// </summary>
-        /// <param name="query">The query to handle.</param>
-        /// <param name="cancellationToken">The cancellation token to observe.</param>
-        /// <returns>An awaitable task representing the asynchronous operation. The task result will contain the result of the query.</returns>
         Task<TResult> HandleAsync(TQuery query, CancellationToken cancellationToken);
     }
 }

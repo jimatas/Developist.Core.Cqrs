@@ -1,12 +1,18 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Cqrs.Commands;
+using Developist.Core.Cqrs.DependencyInjection;
+using Developist.Core.Cqrs.Events;
+using Developist.Core.Cqrs.Queries;
+
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace Developist.Core.Cqrs.Tests
 {
@@ -24,13 +30,17 @@ namespace Developist.Core.Cqrs.Tests
             var services = new ServiceCollection()
                 .AddScoped<IDictionary<Guid, Message>>(_ => database)
                 .AddScoped<IList<string>>(_ => output)
-                .AddCqrs();
+                .AddDispatcher()
+                .AddHandlersFromAssembly(Assembly.GetExecutingAssembly());
 
             serviceProvider = services.BuildServiceProvider();
         }
 
+        [TestCleanup]
+        public void CleanUp() => (serviceProvider as IDisposable)?.Dispose();
+
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersDispatchers()
+        public void AddDispatcher_ByDefault_RegistersDispatchers()
         {
             // Arrange
 
@@ -48,7 +58,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersDispatcherParentInterfacesAsSelf()
+        public void AddDispatcher_ByDefault_RegistersDispatcherParentInterfaces()
         {
             // Arrange
 
@@ -65,7 +75,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersHandlers()
+        public void AddHandlersFromAssembly_ByDefault_RegistersHandlers()
         {
             // Arrange
 
@@ -81,7 +91,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddCqrs_ByDefault_RegistersWrappers()
+        public void AddHandlersFromAssembly_ByDefault_RegistersWrappers()
         {
             // Arrange
 

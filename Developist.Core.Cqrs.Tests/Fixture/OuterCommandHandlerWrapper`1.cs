@@ -1,13 +1,16 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Cqrs.Commands;
+
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Tests
 {
-    public class OuterCommandHandlerWrapper<TCommand> : ICommandHandlerWrapper<TCommand> where TCommand : ICommand
+    public class OuterCommandHandlerWrapper<TCommand> : ICommandHandlerWrapper<TCommand>, IPrioritizable
+        where TCommand : ICommand
     {
         private readonly IList<string> output;
 
@@ -27,7 +30,7 @@ namespace Developist.Core.Cqrs.Tests
             return taskResult;
         }
 
-        // Lowest explicit value in the pipeline, first to run.
-        int ISortable.SortOrder => 10; 
+        // Highest explicitly set priority in the pipeline, should be first to run.
+        public sbyte Priority => Priorities.High;
     }
 }

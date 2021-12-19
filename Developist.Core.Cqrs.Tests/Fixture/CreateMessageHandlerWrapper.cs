@@ -1,13 +1,15 @@
 ﻿// Copyright (c) 2021 Jim Atas. All rights reserved.
 // Licensed under the MIT License. See License.txt in the project root for details.
 
+using Developist.Core.Cqrs.Commands;
+
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Tests
 {
-    public class CreateMessageHandlerWrapper : ICommandHandlerWrapper<CreateMessage>
+    public class CreateMessageHandlerWrapper : ICommandHandlerWrapper<CreateMessage>, IPrioritizable
     {
         private readonly IList<string> output;
 
@@ -27,7 +29,7 @@ namespace Developist.Core.Cqrs.Tests
             return taskResult;
         }
 
-        // Highest sort order value in the execution pipeline, runs last.
-        int ISortable.SortOrder => 30;
+        // Lowest priority in the execution pipeline, should run last.
+        public sbyte Priority => Priorities.Lower;
     }
 }
