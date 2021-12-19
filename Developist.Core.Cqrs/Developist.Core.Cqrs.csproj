@@ -5,13 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Developist.Core.Utilities" Version="2.1.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Reference Include="Developist.Core.Utilities">
-      <HintPath>..\..\Developist.Core.Utilities\Developist.Core.Utilities\bin\Release\netstandard2.0\Developist.Core.Utilities.dll</HintPath>
-    </Reference>
   </ItemGroup>
 
 </Project>
