@@ -45,7 +45,7 @@ namespace Developist.Core.Cqrs
             }
             catch (Exception exception)
             {
-                logger.LogWarning(exception, "Exception thrown during command dispatch. [{ExceptionDetailMessage}]", exception.DetailMessage());
+                logger.LogWarning(exception, "Unhandled exception caught during command dispatch: {ExceptionMessage}", exception.Message);
                 throw;
             }
 
@@ -74,7 +74,7 @@ namespace Developist.Core.Cqrs
             }
             catch (Exception exception)
             {
-                logger.LogWarning(exception, "Exception thrown during query dispatch. [{ExceptionDetailMessage}]", exception.DetailMessage());
+                logger.LogWarning(exception, "Unhandled exception caught during query dispatch: {ExceptionMessage}", exception.Message);
                 throw;
             }
 
@@ -118,7 +118,7 @@ namespace Developist.Core.Cqrs
                 }
                 catch (Exception exception)
                 {
-                    logger.LogWarning(exception, "Exception thrown during event dispatch. [{ExceptionDetailMessage}]", exception.DetailMessage());
+                    logger.LogWarning(exception, "Unhandled exception caught during event dispatch: {ExceptionMessage}", exception.Message);
                     return Task.FromException(exception);
                 }
             }
