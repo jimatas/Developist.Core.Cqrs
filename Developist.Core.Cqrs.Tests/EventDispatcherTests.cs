@@ -45,10 +45,10 @@ namespace Developist.Core.Cqrs.Tests
             MessageCreated nullEvent = null;
 
             // Act
-            async Task action() => await eventDispatcher.DispatchAsync(nullEvent).ConfigureAwait(false);
+            async Task action() => await eventDispatcher.DispatchAsync(nullEvent);
 
             // Assert
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action).ConfigureAwait(false);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -61,7 +61,7 @@ namespace Developist.Core.Cqrs.Tests
             var messageCreated = new MessageCreated { Id = messageId };
 
             // Act
-            await eventDispatcher.DispatchAsync(messageCreated).ConfigureAwait(false);
+            await eventDispatcher.DispatchAsync(messageCreated);
 
             // Assert
             Assert.IsTrue(output.Contains($"{nameof(MessageCreatedDefaultHandler)}.{nameof(MessageCreatedDefaultHandler.HandleAsync)}"));

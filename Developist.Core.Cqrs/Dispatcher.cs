@@ -41,7 +41,7 @@ namespace Developist.Core.Cqrs
             var wrappers = handlerRegistry.GetCommandHandlerWrappers<TCommand>();
             try
             {
-                await ExecutePipeline().ConfigureAwait(false);
+                await ExecutePipeline().WithoutCapturingContext();
             }
             catch (Exception exception)
             {
@@ -70,7 +70,7 @@ namespace Developist.Core.Cqrs
             var wrappers = new ReflectedQueryHandlerWrappers<TResult>(query.GetType(), handlerRegistry);
             try
             {
-                return await ExecutePipeline().ConfigureAwait(false);
+                return await ExecutePipeline().WithoutCapturingContext();
             }
             catch (Exception exception)
             {
@@ -99,7 +99,7 @@ namespace Developist.Core.Cqrs
             var task = Task.WhenAll(handlers.Select(SafeHandleAsync));
             try
             {
-                await task.ConfigureAwait(false);
+                await task.WithoutCapturingContext();
             }
             catch
             {

@@ -45,10 +45,10 @@ namespace Developist.Core.Cqrs.Tests
             CreateMessage nullCommand = null;
 
             // Act
-            async Task action() => await commandDispatcher.DispatchAsync(nullCommand).ConfigureAwait(false);
+            async Task action() => await commandDispatcher.DispatchAsync(nullCommand);
 
             // Assert
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action).ConfigureAwait(false);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 Id = messageId,
                 Text = messageText
-            }).ConfigureAwait(false);
+            });
 
             database.TryGetValue(messageId, out Message message);
 
@@ -88,7 +88,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 Id = messageId,
                 Text = messageText
-            }).ConfigureAwait(false);
+            });
 
             // Assert
             var queue = new Queue<string>(output);

@@ -45,10 +45,10 @@ namespace Developist.Core.Cqrs.Tests
             GetMessageById nullQuery = null;
 
             // Act
-            async Task<Message> action() => await queryDispatcher.DispatchAsync(nullQuery).ConfigureAwait(false);
+            async Task<Message> action() => await queryDispatcher.DispatchAsync(nullQuery);
 
             // Assert
-            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action).ConfigureAwait(false);
+            await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
         }
 
         [TestMethod]
@@ -63,7 +63,7 @@ namespace Developist.Core.Cqrs.Tests
             database.Add(messageId, new Message(messageId) { Text = messageText });
 
             // Act
-            var message = await queryDispatcher.DispatchAsync(new GetMessageById { Id = messageId }).ConfigureAwait(false);
+            var message = await queryDispatcher.DispatchAsync(new GetMessageById { Id = messageId });
 
             // Assert
             Assert.AreEqual(messageText, message.Text);
@@ -81,7 +81,7 @@ namespace Developist.Core.Cqrs.Tests
             database.Add(messageId, new Message(messageId) { Text = messageText });
 
             // Act
-            _ = await queryDispatcher.DispatchAsync(new GetMessageById { Id = messageId }).ConfigureAwait(false);
+            _ = await queryDispatcher.DispatchAsync(new GetMessageById { Id = messageId });
 
             // Assert
             var queue = new Queue<string>(output);
