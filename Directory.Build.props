@@ -6,7 +6,7 @@
     <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <Version>2.2.3</Version>
+    <Version>2.2.4</Version>
     <Major>$(Version.Split('.')[0])</Major>
     <Minor>$(Version.Split('.')[1])</Minor>
     <Build>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</Build>
