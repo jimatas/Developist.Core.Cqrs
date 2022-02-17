@@ -17,10 +17,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Fixture\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Developist.Core.Cqrs.DependencyInjection\Developist.Core.Cqrs.DependencyInjection.csproj" />
     <ProjectReference Include="..\Developist.Core.Cqrs\Developist.Core.Cqrs.csproj" />
   </ItemGroup>

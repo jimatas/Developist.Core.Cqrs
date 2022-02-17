@@ -80,15 +80,15 @@ namespace Developist.Core.Cqrs
 
             Task<TResult> ExecutePipeline()
             {
-                HandlerDelegate<TResult> pipeline = () => handler.InvokeAsync(query, cancellationToken);
-                foreach (object wrapper in wrappers.OrderBy(wrapper => (wrapper as IPrioritizable)?.Priority ?? Priorities.Normal))
+                HandlerDelegate<TResult> pipeline = () => handler.HandleAsync(query, cancellationToken);
+                foreach (var wrapper in wrappers.OrderBy(wrapper => ((IPrioritizable)wrapper).Priority))
                 {
                     pipeline = Pipe(pipeline, wrapper);
                 }
                 return pipeline();
             }
 
-            HandlerDelegate<TResult> Pipe(object next, object wrapper) => () => wrappers.InvokeAsync(wrapper, query, next, cancellationToken);
+            HandlerDelegate<TResult> Pipe(HandlerDelegate<TResult> next, ReflectedQueryHandlerWrapper<TResult> wrapper) => () => wrapper.HandleAsync(query, next, cancellationToken);
         }
 
         async Task IEventDispatcher.DispatchAsync<TEvent>(TEvent e, CancellationToken cancellationToken)
@@ -135,11 +135,11 @@ namespace Developist.Core.Cqrs
                 handleMethod = handler.GetType().GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.HandleAsync), BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod);
             }
 
-            public Task<TResult> InvokeAsync(object query, object cancellationToken)
+            public Task<TResult> HandleAsync(IQuery<TResult> query, CancellationToken cancellationToken)
             {
                 try
                 {
-                    return (Task<TResult>)handleMethod.Invoke(handler, new[] { query, cancellationToken });
+                    return (Task<TResult>)handleMethod.Invoke(handler, new object[] { query, cancellationToken });
                 }
                 catch (TargetInvocationException exception)
                 {
@@ -149,7 +149,7 @@ namespace Developist.Core.Cqrs
             }
         }
 
-        private class ReflectedQueryHandlerWrappers<TResult> : IEnumerable<object>
+        private class ReflectedQueryHandlerWrappers<TResult> : IEnumerable<ReflectedQueryHandlerWrapper<TResult>>
         {
             private readonly IEnumerable<object> wrappers;
             private readonly MethodInfo handleMethod;
@@ -162,13 +162,30 @@ namespace Developist.Core.Cqrs
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-            public IEnumerator<object> GetEnumerator() => wrappers.GetEnumerator();
+            public IEnumerator<ReflectedQueryHandlerWrapper<TResult>> GetEnumerator()
+            {
+                return wrappers.Select(wrapper => new ReflectedQueryHandlerWrapper<TResult>(wrapper, handleMethod)).GetEnumerator();
+            }
+        }
 
-            public Task<TResult> InvokeAsync(object wrapper, object query, object next, object cancellationToken)
+        private class ReflectedQueryHandlerWrapper<TResult> : IPrioritizable
+        {
+            private readonly object wrapper;
+            private readonly MethodInfo handleMethod;
+
+            public ReflectedQueryHandlerWrapper(object wrapper, MethodInfo handleMethod)
+            {
+                this.wrapper = wrapper;
+                this.handleMethod = handleMethod;
+            }
+
+            sbyte IPrioritizable.Priority => (wrapper as IPrioritizable)?.Priority ?? Priorities.Normal;
+
+            public Task<TResult> HandleAsync(IQuery<TResult> query, HandlerDelegate<TResult> next, CancellationToken cancellationToken)
             {
                 try
                 {
-                    return (Task<TResult>)handleMethod.Invoke(wrapper, new[] { query, next, cancellationToken });
+                    return (Task<TResult>)handleMethod.Invoke(wrapper, new object[] { query, next, cancellationToken });
                 }
                 catch (TargetInvocationException exception)
                 {

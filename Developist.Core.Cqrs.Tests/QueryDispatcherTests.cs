@@ -70,7 +70,7 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public async Task DispatchAsync_GivenGetMessageById_RunsWrappers()
+        public async Task DispatchAsync_GivenGetMessageById_RunsWrappersInOrder()
         {
             // Arrange
             var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
@@ -86,9 +86,13 @@ namespace Developist.Core.Cqrs.Tests
             // Assert
             var queue = new Queue<string>(output);
 
+            Assert.AreEqual($"{nameof(OuterQueryHandlerWrapper<GetMessageById, Message>)}.{nameof(OuterQueryHandlerWrapper<GetMessageById, Message>.HandleAsync)}_Before", queue.Dequeue());
             Assert.AreEqual($"{nameof(GetMessageByIdHandlerWrapper)}.{nameof(GetMessageByIdHandlerWrapper.HandleAsync)}_Before", queue.Dequeue());
+            Assert.AreEqual($"{nameof(InnerQueryHandlerWrapper<GetMessageById, Message>)}.{nameof(InnerQueryHandlerWrapper<GetMessageById, Message>.HandleAsync)}_Before", queue.Dequeue());
             Assert.AreEqual($"{nameof(GetMessageByIdHandler)}.{nameof(GetMessageByIdHandler.HandleAsync)}", queue.Dequeue());
+            Assert.AreEqual($"{nameof(InnerQueryHandlerWrapper<GetMessageById, Message>)}.{nameof(InnerQueryHandlerWrapper<GetMessageById, Message>.HandleAsync)}_After", queue.Dequeue());
             Assert.AreEqual($"{nameof(GetMessageByIdHandlerWrapper)}.{nameof(GetMessageByIdHandlerWrapper.HandleAsync)}_After", queue.Dequeue());
+            Assert.AreEqual($"{nameof(OuterQueryHandlerWrapper<GetMessageById, Message>)}.{nameof(OuterQueryHandlerWrapper<GetMessageById, Message>.HandleAsync)}_After", queue.Dequeue());
         }
     }
 }
