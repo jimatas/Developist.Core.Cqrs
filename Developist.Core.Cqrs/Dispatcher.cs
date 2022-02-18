@@ -81,7 +81,7 @@ namespace Developist.Core.Cqrs
             Task<TResult> ExecutePipeline()
             {
                 HandlerDelegate<TResult> pipeline = () => handler.HandleAsync(query, cancellationToken);
-                foreach (var wrapper in wrappers.OrderBy(wrapper => ((IPrioritizable)wrapper).Priority))
+                foreach (var wrapper in wrappers.OrderBy(wrapper => wrapper.Priority))
                 {
                     pipeline = Pipe(pipeline, wrapper);
                 }
@@ -168,7 +168,7 @@ namespace Developist.Core.Cqrs
             }
         }
 
-        private class ReflectedQueryHandlerWrapper<TResult> : IPrioritizable
+        private class ReflectedQueryHandlerWrapper<TResult>
         {
             private readonly object wrapper;
             private readonly MethodInfo handleMethod;
@@ -179,7 +179,7 @@ namespace Developist.Core.Cqrs
                 this.handleMethod = handleMethod;
             }
 
-            sbyte IPrioritizable.Priority => (wrapper as IPrioritizable)?.Priority ?? Priorities.Normal;
+            public sbyte Priority => (wrapper as IPrioritizable)?.Priority ?? Priorities.Normal;
 
             public Task<TResult> HandleAsync(IQuery<TResult> query, HandlerDelegate<TResult> next, CancellationToken cancellationToken)
             {
