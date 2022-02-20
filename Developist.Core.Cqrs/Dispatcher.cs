@@ -132,7 +132,7 @@ namespace Developist.Core.Cqrs
             public ReflectedQueryHandler(Type queryType, IHandlerRegistry handlerRegistry)
             {
                 handler = handlerRegistry.GetQueryHandler(queryType, typeof(TResult));
-                handleMethod = handler.GetType().GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.HandleAsync), BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod);
+                handleMethod = handler.GetType().GetMethod(nameof(IQueryHandler<IQuery<TResult>, TResult>.HandleAsync), BindingFlags.Public | BindingFlags.Instance);
             }
 
             public Task<TResult> HandleAsync(IQuery<TResult> query, CancellationToken cancellationToken)
@@ -158,7 +158,7 @@ namespace Developist.Core.Cqrs
             {
                 wrappers = handlerRegistry.GetQueryHandlerWrappers(queryType, typeof(TResult));
                 handleMethod = typeof(IQueryHandlerWrapper<,>).MakeGenericType(queryType, typeof(TResult))
-                    .GetMethod(nameof(IQueryHandlerWrapper<IQuery<TResult>, TResult>.HandleAsync), BindingFlags.Public | BindingFlags.Instance | BindingFlags.InvokeMethod);
+                    .GetMethod(nameof(IQueryHandlerWrapper<IQuery<TResult>, TResult>.HandleAsync), BindingFlags.Public | BindingFlags.Instance);
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
