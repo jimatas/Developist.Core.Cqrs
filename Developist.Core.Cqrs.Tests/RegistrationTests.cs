@@ -1,5 +1,6 @@
 ﻿using Developist.Core.Cqrs.Commands;
 using Developist.Core.Cqrs.Events;
+using Developist.Core.Cqrs.Infrastructure;
 using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
 using Developist.Core.Cqrs.Queries;
 using Developist.Core.Cqrs.Tests.Fixture;
@@ -93,6 +94,36 @@ namespace Developist.Core.Cqrs.Tests
             // Assert
             Assert.IsTrue(sampleCommandInterceptors.Any());
             Assert.IsTrue(sampleQueryInterceptors.Any());
+        }
+
+        [TestMethod]
+        public void GetCommandHandler_CommandWithoutHandler_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var provider = CreateServiceProvider();
+            var handlerRegistry = provider.GetRequiredService<IHandlerRegistry>();
+
+            // Act
+            void action() => handlerRegistry.GetCommandHandler(typeof(CommandWithoutHandler));
+
+            // Assert
+            var exception = Assert.ThrowsException<InvalidOperationException>(action);
+            Assert.AreEqual($"No handler found for command with type {typeof(CommandWithoutHandler)}.", exception.Message);
+        }
+
+        [TestMethod]
+        public void GetCommandHandler_CommandWithMultipleHandlers_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var provider = CreateServiceProvider();
+            var handlerRegistry = provider.GetRequiredService<IHandlerRegistry>();
+
+            // Act
+            void action() => handlerRegistry.GetCommandHandler(typeof(CommandWithMultipleHandlers));
+
+            // Assert
+            var exception = Assert.ThrowsException<InvalidOperationException>(action);
+            Assert.AreEqual($"More than one handler found for command with type {typeof(CommandWithMultipleHandlers)}.", exception.Message);
         }
     }
 }
