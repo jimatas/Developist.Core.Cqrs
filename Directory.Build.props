@@ -14,7 +14,7 @@
     <FileVersion>$(AssemblyVersion)</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <Description>CQRS library built around an in-process mediator that can dispatch command, query, and event messages for handling by user-defined handlers.</Description>
+    <Description>Lightweight CQRS library built around an in-process mediator that can dispatch command, query, and event messages for handling by user-defined handlers.</Description>
     <PackageTags>cqrs;command;query;event</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
