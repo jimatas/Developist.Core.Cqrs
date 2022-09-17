@@ -2,11 +2,10 @@
   <PropertyGroup>
     <Product>Developist.Core.Cqrs</Product>
     <Authors>Jim Atas</Authors>
-    <Company>Developist</Company>
     <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <Version>2.2.7</Version>
+    <Version>3.0.0</Version>
     <Major>$(Version.Split('.')[0])</Major>
     <Minor>$(Version.Split('.')[1])</Minor>
     <Build>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</Build>
@@ -15,20 +14,12 @@
     <FileVersion>$(AssemblyVersion)</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
-    <Deterministic>true</Deterministic>
-    <NeutralLanguage>en</NeutralLanguage>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup>
-    <Description>CQRS messaging library built around an in-process mediator that can dispatch command, query and event messages. Supports wrapping of message handlers to create processing pipelines. Targets .NET Standard 2.0.</Description>
-    <PackageTags>cqrs;dispatcher;command;query;event;handler</PackageTags>
+    <Description>CQRS library built around an in-process mediator that can dispatch command, query, and event messages for handling by user-defined handlers.</Description>
+    <PackageTags>cqrs;command;query;event</PackageTags>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/jimatas/Developist.Core.Cqrs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jimatas/Developist.Core.Cqrs</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="../License.txt" Pack="True" PackagePath="$(PackageLicenseFile)"/>
-  </ItemGroup>
 </Project>
