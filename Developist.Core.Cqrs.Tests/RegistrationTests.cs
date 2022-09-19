@@ -17,7 +17,7 @@ namespace Developist.Core.Cqrs.Tests
         private static ServiceProvider CreateServiceProvider()
         {
             var services = new ServiceCollection();
-            services.AddCqrs()
+            services.ConfigureCqrs()
                 .AddDefaultDispatcher()
                 .AddDefaultRegistry()
                 .AddHandlersFromAssembly(Assembly.GetExecutingAssembly())

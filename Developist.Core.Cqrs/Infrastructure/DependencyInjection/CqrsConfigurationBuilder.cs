@@ -10,9 +10,9 @@ using System.Reflection;
 
 namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
 {
-    public sealed class CqrsBuilder : IDispatcherConfiguration, IRegistryConfiguration, IHandlerConfiguration, IInterceptorConfiguration
+    public sealed class CqrsConfigurationBuilder : IDispatcherConfiguration, IRegistryConfiguration, IHandlerConfiguration, IInterceptorConfiguration
     {
-        internal CqrsBuilder(IServiceCollection services) => Services = services;
+        internal CqrsConfigurationBuilder(IServiceCollection services) => Services = services;
 
         public IServiceCollection Services { get; }
 

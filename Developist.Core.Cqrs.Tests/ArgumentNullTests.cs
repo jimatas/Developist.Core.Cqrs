@@ -14,7 +14,7 @@ namespace Developist.Core.Cqrs.Tests
         private static ServiceProvider CreateServiceProvider()
         {
             var services = new ServiceCollection();
-            services.AddCqrs()
+            services.ConfigureCqrs()
                 .AddDefaultDispatcher()
                 .AddDefaultRegistry();
 
@@ -25,8 +25,8 @@ namespace Developist.Core.Cqrs.Tests
         public void AddHandlersFromAssembly_GivenNullAssembly_ThrowsArgumentNullException()
         {
             // Arrange
-            CqrsBuilder builder = (CqrsBuilder)new ServiceCollection().AddCqrs();
-
+            CqrsConfigurationBuilder builder = (CqrsConfigurationBuilder)new ServiceCollection().ConfigureCqrs();
+            
             // Act
             void action() => ((IHandlerConfiguration)builder).AddHandlersFromAssembly(null!);
 
@@ -39,7 +39,7 @@ namespace Developist.Core.Cqrs.Tests
         public void AddInterceptorsFromAssembly_GivenNullAssembly_ThrowsArgumentNullException()
         {
             // Arrange
-            CqrsBuilder builder = (CqrsBuilder)new ServiceCollection().AddCqrs();
+            CqrsConfigurationBuilder builder = (CqrsConfigurationBuilder)new ServiceCollection().ConfigureCqrs();
 
             // Act
             void action() => ((IInterceptorConfiguration)builder).AddInterceptorsFromAssembly(null!);
