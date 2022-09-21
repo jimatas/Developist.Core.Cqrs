@@ -2,7 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace Developist.Core.Cqrs
+namespace Developist.Core.Cqrs.Utilities
 {
     internal static class ArgumentNullExceptionHelper
     {
@@ -13,7 +13,7 @@ namespace Developist.Core.Cqrs
             if (value is null)
             {
                 var paramName = (argument.Body as MemberExpression ?? (argument.Body as UnaryExpression)?.Operand as MemberExpression)?.Member.Name;
-                throw new ArgumentNullException(paramName);
+                throw new ArgumentNullException(paramName, $"Parameter '{paramName}' cannot be null.");
             }
             return value;
         }

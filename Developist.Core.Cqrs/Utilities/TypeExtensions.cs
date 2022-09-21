@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
+namespace Developist.Core.Cqrs.Utilities
 {
     internal static class TypeExtensions
     {

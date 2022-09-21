@@ -2,6 +2,7 @@
 using Developist.Core.Cqrs.Events;
 using Developist.Core.Cqrs.Infrastructure;
 using Developist.Core.Cqrs.Queries;
+using Developist.Core.Cqrs.Utilities;
 
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
