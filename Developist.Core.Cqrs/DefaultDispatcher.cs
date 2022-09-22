@@ -26,8 +26,8 @@ namespace Developist.Core.Cqrs
 
         public DefaultDispatcher(IHandlerRegistry handlerRegistry, IInterceptorRegistry interceptorRegistry, ILogger<DefaultDispatcher>? logger = null)
         {
-            this.handlerRegistry = handlerRegistry;
-            this.interceptorRegistry = interceptorRegistry;
+            this.handlerRegistry = ArgumentNullExceptionHelper.ThrowIfNull(() => handlerRegistry);
+            this.interceptorRegistry = ArgumentNullExceptionHelper.ThrowIfNull(() => interceptorRegistry);
             this.logger = logger ?? NullLogger<DefaultDispatcher>.Instance;
         }
 

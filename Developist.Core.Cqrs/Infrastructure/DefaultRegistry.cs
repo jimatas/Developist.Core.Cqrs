@@ -1,6 +1,7 @@
 ﻿using Developist.Core.Cqrs.Commands;
 using Developist.Core.Cqrs.Events;
 using Developist.Core.Cqrs.Queries;
+using Developist.Core.Cqrs.Utilities;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +15,10 @@ namespace Developist.Core.Cqrs.Infrastructure
     {
         private readonly IServiceProvider serviceProvider;
 
-        public DefaultRegistry(IServiceProvider provider) => serviceProvider = provider;
+        public DefaultRegistry(IServiceProvider provider)
+        {
+            serviceProvider = ArgumentNullExceptionHelper.ThrowIfNull(() => provider);
+        }
 
         public object GetCommandHandler(Type commandType)
         {

@@ -1,5 +1,6 @@
 ﻿using Developist.Core.Cqrs.Commands;
 using Developist.Core.Cqrs.Events;
+using Developist.Core.Cqrs.Infrastructure;
 using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
 using Developist.Core.Cqrs.Queries;
 using Developist.Core.Cqrs.Tests.Fixture;
@@ -19,6 +20,46 @@ namespace Developist.Core.Cqrs.Tests
                 .AddDefaultRegistry();
 
             return services.BuildServiceProvider();
+        }
+
+        [TestMethod]
+        public void InitializeDefaultRegistry_GivenNullServiceProvider_ThrowsArgumentNullException()
+        {
+            // Arrange
+
+            // Act
+            static void action() => _ = new DefaultRegistry(provider: null!);
+
+            // Assert
+            Assert.ThrowsException<ArgumentNullException>(action);
+        }
+
+        [TestMethod]
+        public void InitializeDefaultDispatcher_GivenNullHandlerRegistry_ThrowsArgumentNullException()
+        {
+            // Arrange
+            IInterceptorRegistry interceptorRegistry = new DefaultRegistry(CreateServiceProvider());
+
+            // Act
+            void action() => _ = new DefaultDispatcher(handlerRegistry: null!, interceptorRegistry);
+
+            // Assert
+            var exception = Assert.ThrowsException<ArgumentNullException>(action);
+            Assert.AreEqual("handlerRegistry", exception.ParamName);
+        }
+
+        [TestMethod]
+        public void InitializeDefaultDispatcher_GivenNullInterceptorRegistry_ThrowsArgumentNullException()
+        {
+            // Arrange
+            IHandlerRegistry handlerRegistry = new DefaultRegistry(CreateServiceProvider());
+
+            // Act
+            void action() => _ = new DefaultDispatcher(handlerRegistry, interceptorRegistry: null!);
+
+            // Assert
+            var exception = Assert.ThrowsException<ArgumentNullException>(action);
+            Assert.AreEqual("interceptorRegistry", exception.ParamName);
         }
 
         [TestMethod]
