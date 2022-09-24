@@ -5,13 +5,15 @@
     <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
   </PropertyGroup>
   <PropertyGroup>
-    <Version>4.0.2</Version>
-    <Major>$(Version.Split('.')[0])</Major>
-    <Minor>$(Version.Split('.')[1])</Minor>
+    <Major>4</Major>
+    <Minor>1</Minor>
+    <Patch>0</Patch>
     <Build>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</Build>
     <Revision>$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</Revision>
-    <AssemblyVersion>$(Major).$(Minor).$(Build).$(Revision)</AssemblyVersion>
-    <FileVersion>$(AssemblyVersion)</FileVersion>
+    <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>
+    <VersionSuffix></VersionSuffix>
+    <AssemblyVersion>$(Major).$(Minor).0.0</AssemblyVersion>
+    <FileVersion>$(Major).$(Minor).$(Build).$(Revision)</FileVersion>
   </PropertyGroup>
   <PropertyGroup>
     <Description>Lightweight CQRS library built around an in-process mediator that can dispatch command, query, and event messages for handling by user-defined handlers.</Description>
