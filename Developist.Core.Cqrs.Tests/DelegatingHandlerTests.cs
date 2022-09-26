@@ -47,7 +47,7 @@ namespace Developist.Core.Cqrs.Tests
                 services.ConfigureCqrs()
                     .AddDefaultDispatcher()
                     .AddDefaultRegistry()
-                    .AddQueryHandler<GetUserQuery, User?>((query, token, provider) =>
+                    .AddQueryHandler<GetUserQuery, User?>((query, provider, token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return Task.FromResult<User?>(null);
@@ -99,7 +99,7 @@ namespace Developist.Core.Cqrs.Tests
                     .AddDefaultDispatcher()
                     .AddDefaultRegistry()
                     .AddQueryHandler<GetUserQuery, User?>((query, token) => Task.FromResult<User?>(null))
-                    .AddQueryInterceptor((GetUserQuery query, HandlerDelegate<User?> next, CancellationToken token, IServiceProvider provider) =>
+                    .AddQueryInterceptor((GetUserQuery query, HandlerDelegate<User?> next, IServiceProvider provider, CancellationToken token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return next();
@@ -147,7 +147,7 @@ namespace Developist.Core.Cqrs.Tests
                 services.ConfigureCqrs()
                     .AddDefaultDispatcher()
                     .AddDefaultRegistry()
-                    .AddCommandHandler<AddUserCommand>((command, token, provider) =>
+                    .AddCommandHandler<AddUserCommand>((command, provider, token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return Task.CompletedTask;
@@ -199,7 +199,7 @@ namespace Developist.Core.Cqrs.Tests
                     .AddDefaultDispatcher()
                     .AddDefaultRegistry()
                     .AddCommandHandler<AddUserCommand>((command, token) => Task.CompletedTask)
-                    .AddCommandInterceptor((AddUserCommand command, HandlerDelegate next, CancellationToken token, IServiceProvider provider) =>
+                    .AddCommandInterceptor((AddUserCommand command, HandlerDelegate next, IServiceProvider provider, CancellationToken token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return next();
@@ -241,7 +241,7 @@ namespace Developist.Core.Cqrs.Tests
                 services.ConfigureCqrs()
                     .AddDefaultDispatcher()
                     .AddDefaultRegistry()
-                    .AddEventHandler<UserLoggedIn>((@event, token, provider) =>
+                    .AddEventHandler<UserLoggedIn>((@event, provider, token) =>
                     {
                         var repository = provider.GetRequiredService<UserRepository>();
                         loggedInUser = repository.FirstOrDefault(u => u.UserName.Equals(@event.UserName));
