@@ -7,7 +7,7 @@
   <PropertyGroup>
     <Major>5</Major>
     <Minor>0</Minor>
-    <Patch>0</Patch>
+    <Patch>1</Patch>
     <Build>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</Build>
     <Revision>$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</Revision>
     <VersionPrefix>$(Major).$(Minor).$(Patch)</VersionPrefix>

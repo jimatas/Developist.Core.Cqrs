@@ -13,7 +13,7 @@ namespace Developist.Core.Cqrs.Utilities
             if (value is null)
             {
                 var paramName = (argument.Body as MemberExpression ?? (argument.Body as UnaryExpression)?.Operand as MemberExpression)?.Member.Name;
-                throw new ArgumentNullException(paramName, $"Parameter '{paramName}' cannot be null.");
+                throw new ArgumentNullException(paramName);
             }
             return value;
         }
