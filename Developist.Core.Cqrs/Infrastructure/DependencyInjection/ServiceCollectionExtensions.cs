@@ -6,10 +6,10 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsBuilder> buildAction)
+        public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsBuilder> setupAction)
         {
             var builder = new CqrsBuilder(services);
-            buildAction(builder);
+            setupAction(builder);
             return services;
         }
     }
