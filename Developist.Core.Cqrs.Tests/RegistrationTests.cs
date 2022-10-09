@@ -108,7 +108,7 @@ namespace Developist.Core.Cqrs.Tests
 
             // Assert
             var exception = Assert.ThrowsException<InvalidOperationException>(action);
-            Assert.AreEqual($"No handler found for command with type {typeof(CommandWithoutHandler)}.", exception.Message);
+            Assert.AreEqual($"No handler found for command with type '{typeof(CommandWithoutHandler)}'.", exception.Message);
         }
 
         [TestMethod]
@@ -123,7 +123,7 @@ namespace Developist.Core.Cqrs.Tests
 
             // Assert
             var exception = Assert.ThrowsException<InvalidOperationException>(action);
-            Assert.AreEqual($"More than one handler found for command with type {typeof(CommandWithMultipleHandlers)}.", exception.Message);
+            Assert.AreEqual($"More than one handler found for command with type '{typeof(CommandWithMultipleHandlers)}'.", exception.Message);
         }
     }
 }

@@ -26,7 +26,7 @@ namespace Developist.Core.Cqrs.Infrastructure
             var handlers = serviceProvider.GetServices(handlerType);
             return handlers.Count() == 1
                 ? handlers.Single()!
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type {commandType}.");
+                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{commandType}'.");
         }
 
         public IEnumerable<object> GetCommandInterceptors(Type commandType)
@@ -47,7 +47,7 @@ namespace Developist.Core.Cqrs.Infrastructure
             var handlers = serviceProvider.GetServices(handlerType);
             return handlers.Count() == 1
                 ? handlers.Single()!
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type {queryType}.");
+                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{queryType}'.");
         }
 
         public IEnumerable<object> GetQueryInterceptors(Type queryType, Type resultType)
