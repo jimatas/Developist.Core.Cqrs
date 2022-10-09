@@ -11,86 +11,86 @@ using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
 {
-    public static class CqrsConfigurationBuilderExtensions
+    public static partial class CqrsBuilderExtensions
     {
-        public static IInterceptorConfiguration AddCommandHandler<TCommand>(this IHandlerConfiguration configuration, Func<TCommand, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddCommandHandler<TCommand>(this CqrsBuilder builder, Func<TCommand, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TCommand : ICommand
         {
             var service = new ServiceDescriptor(typeof(ICommandHandler<TCommand>), _ => new DelegatingCommandHandler<TCommand>(handleAsync), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return (IInterceptorConfiguration)configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddCommandHandler<TCommand>(this IHandlerConfiguration configuration, Func<TCommand, IServiceProvider, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddCommandHandler<TCommand>(this CqrsBuilder builder, Func<TCommand, IServiceProvider, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TCommand : ICommand
         {
             var service = new ServiceDescriptor(typeof(ICommandHandler<TCommand>), provider => new DelegatingCommandHandler<TCommand>(handleAsync, provider), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return (IInterceptorConfiguration)configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddCommandInterceptor<TCommand>(this IInterceptorConfiguration configuration, Func<TCommand, HandlerDelegate, CancellationToken, Task> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddCommandInterceptor<TCommand>(this CqrsBuilder builder, Func<TCommand, HandlerDelegate, CancellationToken, Task> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TCommand : ICommand
         {
             var service = new ServiceDescriptor(typeof(ICommandInterceptor<TCommand>), _ => new DelegatingCommandInterceptor<TCommand>(interceptAsync), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddCommandInterceptor<TCommand>(this IInterceptorConfiguration configuration, Func<TCommand, HandlerDelegate, IServiceProvider, CancellationToken, Task> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddCommandInterceptor<TCommand>(this CqrsBuilder builder, Func<TCommand, HandlerDelegate, IServiceProvider, CancellationToken, Task> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TCommand : ICommand
         {
             var service = new ServiceDescriptor(typeof(ICommandInterceptor<TCommand>), provider => new DelegatingCommandInterceptor<TCommand>(interceptAsync, provider), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddEventHandler<TEvent>(this IHandlerConfiguration configuration, Func<TEvent, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddEventHandler<TEvent>(this CqrsBuilder builder, Func<TEvent, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TEvent : IEvent
         {
             var service = new ServiceDescriptor(typeof(IEventHandler<TEvent>), _ => new DelegatingEventHandler<TEvent>(handleAsync), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return (IInterceptorConfiguration)configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddEventHandler<TEvent>(this IHandlerConfiguration configuration, Func<TEvent, IServiceProvider, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddEventHandler<TEvent>(this CqrsBuilder builder, Func<TEvent, IServiceProvider, CancellationToken, Task> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TEvent : IEvent
         {
             var service = new ServiceDescriptor(typeof(IEventHandler<TEvent>), provider => new DelegatingEventHandler<TEvent>(handleAsync, provider), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return (IInterceptorConfiguration)configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddQueryHandler<TQuery, TResult>(this IHandlerConfiguration configuration, Func<TQuery, CancellationToken, Task<TResult>> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddQueryHandler<TQuery, TResult>(this CqrsBuilder builder, Func<TQuery, CancellationToken, Task<TResult>> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TQuery : IQuery<TResult>
         {
             var service = new ServiceDescriptor(typeof(IQueryHandler<TQuery, TResult>), _ => new DelegatingQueryHandler<TQuery, TResult>(handleAsync), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return (IInterceptorConfiguration)configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddQueryHandler<TQuery, TResult>(this IHandlerConfiguration configuration, Func<TQuery, IServiceProvider, CancellationToken, Task<TResult>> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddQueryHandler<TQuery, TResult>(this CqrsBuilder builder, Func<TQuery, IServiceProvider, CancellationToken, Task<TResult>> handleAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TQuery : IQuery<TResult>
         {
             var service = new ServiceDescriptor(typeof(IQueryHandler<TQuery, TResult>), provider => new DelegatingQueryHandler<TQuery, TResult>(handleAsync, provider), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return (IInterceptorConfiguration)configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddQueryInterceptor<TQuery, TResult>(this IInterceptorConfiguration configuration, Func<TQuery, HandlerDelegate<TResult>, CancellationToken, Task<TResult>> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddQueryInterceptor<TQuery, TResult>(this CqrsBuilder builder, Func<TQuery, HandlerDelegate<TResult>, CancellationToken, Task<TResult>> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TQuery : IQuery<TResult>
         {
             var service = new ServiceDescriptor(typeof(IQueryInterceptor<TQuery, TResult>), _ => new DelegatingQueryInterceptor<TQuery, TResult>(interceptAsync), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
-        public static IInterceptorConfiguration AddQueryInterceptor<TQuery, TResult>(this IInterceptorConfiguration configuration, Func<TQuery, HandlerDelegate<TResult>, IServiceProvider, CancellationToken, Task<TResult>> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddQueryInterceptor<TQuery, TResult>(this CqrsBuilder builder, Func<TQuery, HandlerDelegate<TResult>, IServiceProvider, CancellationToken, Task<TResult>> interceptAsync, ServiceLifetime lifetime = ServiceLifetime.Scoped)
             where TQuery : IQuery<TResult>
         {
             var service = new ServiceDescriptor(typeof(IQueryInterceptor<TQuery, TResult>), provider => new DelegatingQueryInterceptor<TQuery, TResult>(interceptAsync, provider), lifetime);
-            ((CqrsConfigurationBuilder)configuration).Services.Add(service);
-            return configuration;
+            builder.Services.Add(service);
+            return builder;
         }
 
         private class DelegatingCommandHandler<TCommand> : ICommandHandler<TCommand>

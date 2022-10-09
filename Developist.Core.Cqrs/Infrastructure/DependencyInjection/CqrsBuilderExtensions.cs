@@ -4,6 +4,7 @@ using Developist.Core.Cqrs.Queries;
 using Developist.Core.Cqrs.Utilities;
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 using System;
 using System.Linq;
@@ -11,32 +12,28 @@ using System.Reflection;
 
 namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
 {
-    public sealed class CqrsConfigurationBuilder : IDispatcherConfiguration, IRegistryConfiguration, IHandlerConfiguration, IInterceptorConfiguration
+    public static partial class CqrsBuilderExtensions
     {
-        internal CqrsConfigurationBuilder(IServiceCollection services) => Services = services;
-
-        public IServiceCollection Services { get; }
-
-        IRegistryConfiguration IDispatcherConfiguration.AddDefaultDispatcher(ServiceLifetime lifetime)
+        public static CqrsBuilder AddDefaultDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
-            Services.Add(new ServiceDescriptor(typeof(IDispatcher), typeof(DefaultDispatcher), lifetime));
-            Services.Add(new ServiceDescriptor(typeof(ICommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
-            Services.Add(new ServiceDescriptor(typeof(IEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
-            Services.Add(new ServiceDescriptor(typeof(IQueryDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDispatcher), typeof(DefaultDispatcher), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(ICommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IQueryDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
 
-            return this;
+            return builder;
         }
 
-        IHandlerConfiguration IRegistryConfiguration.AddDefaultRegistry(ServiceLifetime lifetime)
+        public static CqrsBuilder AddDefaultRegistry(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
-            Services.Add(new ServiceDescriptor(typeof(DefaultRegistry), typeof(DefaultRegistry), lifetime));
-            Services.Add(new ServiceDescriptor(typeof(IHandlerRegistry), provider => provider.GetRequiredService<DefaultRegistry>(), lifetime));
-            Services.Add(new ServiceDescriptor(typeof(IInterceptorRegistry), provider => provider.GetRequiredService<DefaultRegistry>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(DefaultRegistry), typeof(DefaultRegistry), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), provider => provider.GetRequiredService<DefaultRegistry>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IInterceptorRegistry), provider => provider.GetRequiredService<DefaultRegistry>(), lifetime));
 
-            return this;
+            return builder;
         }
 
-        IInterceptorConfiguration IHandlerConfiguration.AddHandlersFromAssembly(Assembly assembly, ServiceLifetime lifetime)
+        public static CqrsBuilder AddHandlersFromAssembly(this CqrsBuilder builder, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
             ArgumentNullExceptionHelper.ThrowIfNull(() => assembly);
 
@@ -48,11 +45,11 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
                     {
                         if (!type.IsGenericType)
                         {
-                            Services.Add(new ServiceDescriptor(implementedInterface, type, lifetime));
+                            builder.Services.Add(new ServiceDescriptor(implementedInterface, type, lifetime));
                         }
                         else if (implementedInterface.GetGenericArguments().All(arg => arg.IsGenericParameter))
                         {
-                            Services.Add(new ServiceDescriptor(openGenericInterface, type, lifetime));
+                            builder.Services.Add(new ServiceDescriptor(openGenericInterface, type, lifetime));
                         }
                         else
                         {
@@ -62,10 +59,10 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
                 }
             }
 
-            return this;
+            return builder;
         }
 
-        IInterceptorConfiguration IInterceptorConfiguration.AddInterceptorsFromAssembly(Assembly assembly, ServiceLifetime lifetime)
+        public static CqrsBuilder AddInterceptorsFromAssembly(this CqrsBuilder builder, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
             ArgumentNullExceptionHelper.ThrowIfNull(() => assembly);
 
@@ -77,11 +74,11 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
                     {
                         if (!type.IsGenericType)
                         {
-                            Services.Add(new ServiceDescriptor(implementedInterface, type, lifetime));
+                            builder.Services.Add(new ServiceDescriptor(implementedInterface, type, lifetime));
                         }
                         else if (implementedInterface.GetGenericArguments().All(arg => arg.IsGenericParameter))
                         {
-                            Services.Add(new ServiceDescriptor(openGenericInterface, type, lifetime));
+                            builder.Services.Add(new ServiceDescriptor(openGenericInterface, type, lifetime));
                         }
                         else
                         {
@@ -91,7 +88,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
                 }
             }
 
-            return this;
+            return builder;
         }
     }
 }

@@ -17,11 +17,11 @@ namespace Developist.Core.Cqrs.Tests
         private ServiceProvider CreateServiceProvider()
         {
             var services = new ServiceCollection();
-            services.ConfigureCqrs()
-                .AddDefaultDispatcher()
-                .AddDefaultRegistry()
-                .AddHandlersFromAssembly(Assembly.GetExecutingAssembly())
-                .AddInterceptorsFromAssembly(Assembly.GetExecutingAssembly());
+            services.AddCqrs(builder =>
+                builder.AddDefaultDispatcher()
+                    .AddDefaultRegistry()
+                    .AddHandlersFromAssembly(Assembly.GetExecutingAssembly())
+                    .AddInterceptorsFromAssembly(Assembly.GetExecutingAssembly()));
 
             services.AddScoped(_ => log);
             return services.BuildServiceProvider();

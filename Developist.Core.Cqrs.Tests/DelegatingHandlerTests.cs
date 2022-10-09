@@ -17,16 +17,18 @@ namespace Developist.Core.Cqrs.Tests
             UserRepository userRepository = new();
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddQueryHandler<GetUserQuery, User?>((query, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddQueryHandler<GetUserQuery, User?>((query, token) =>
                     {
                         var user = userRepository.FirstOrDefault(
                             u => u.UserName.Equals(query.UserName, query.IsCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
 
                         return Task.FromResult(user);
                     });
+                });
             });
 
             var queryHandler = provider.GetService<IQueryHandler<GetUserQuery, User?>>();
@@ -44,14 +46,16 @@ namespace Developist.Core.Cqrs.Tests
             bool serviceProviderSupplied = false;
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddQueryHandler<GetUserQuery, User?>((query, provider, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddQueryHandler<GetUserQuery, User?>((query, provider, token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return Task.FromResult<User?>(null);
                     });
+                });
             });
 
             var queryHandler = provider.GetService<IQueryHandler<GetUserQuery, User?>>();
@@ -67,21 +71,23 @@ namespace Developist.Core.Cqrs.Tests
             UserRepository userRepository = new();
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddQueryHandler<GetUserQuery, User?>((query, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddQueryHandler<GetUserQuery, User?>((query, token) =>
                     {
                         var user = userRepository.FirstOrDefault(
                             u => u.UserName.Equals(query.UserName, query.IsCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase));
 
                         return Task.FromResult(user);
-                    })
-                    .AddQueryInterceptor<GetUserQuery, User?>((query, next, token) =>
+                    });
+                    builder.AddQueryInterceptor<GetUserQuery, User?>((query, next, token) =>
                     {
                         query.IsCaseSensitive = false;
                         return next();
                     });
+                });
             });
 
             var queryDispatcher = provider.GetRequiredService<IQueryDispatcher>();
@@ -95,15 +101,17 @@ namespace Developist.Core.Cqrs.Tests
             bool serviceProviderSupplied = false;
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddQueryHandler<GetUserQuery, User?>((query, token) => Task.FromResult<User?>(null))
-                    .AddQueryInterceptor((GetUserQuery query, HandlerDelegate<User?> next, IServiceProvider provider, CancellationToken token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddQueryHandler<GetUserQuery, User?>((query, token) => Task.FromResult<User?>(null));
+                    builder.AddQueryInterceptor((GetUserQuery query, HandlerDelegate<User?> next, IServiceProvider provider, CancellationToken token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return next();
                     });
+                });
             });
 
             var queryInterceptor = provider.GetService<IQueryInterceptor<GetUserQuery, User?>>();
@@ -119,14 +127,16 @@ namespace Developist.Core.Cqrs.Tests
             UserRepository userRepository = new();
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddCommandHandler<AddUserCommand>((command, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddCommandHandler<AddUserCommand>((command, token) =>
                     {
                         userRepository.Add(command.UserName, command.DisplayName);
                         return Task.CompletedTask;
                     });
+                });
             });
 
             var commandHandler = provider.GetService<ICommandHandler<AddUserCommand>>();
@@ -144,14 +154,16 @@ namespace Developist.Core.Cqrs.Tests
             bool serviceProviderSupplied = false;
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddCommandHandler<AddUserCommand>((command, provider, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddCommandHandler<AddUserCommand>((command, provider, token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return Task.CompletedTask;
                     });
+                });
             });
 
             var commandHandler = provider.GetService<ICommandHandler<AddUserCommand>>();
@@ -167,19 +179,21 @@ namespace Developist.Core.Cqrs.Tests
             UserRepository userRepository = new();
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddCommandHandler<AddUserCommand>((command, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddCommandHandler<AddUserCommand>((command, token) =>
                     {
                         userRepository.Add(command.UserName, command.DisplayName);
                         return Task.CompletedTask;
-                    })
-                    .AddCommandInterceptor(async (AddUserCommand command, HandlerDelegate next, CancellationToken token) =>
+                    });
+                    builder.AddCommandInterceptor(async (AddUserCommand command, HandlerDelegate next, CancellationToken token) =>
                     {
                         command.DisplayName = $"{command.FirstName} {command.LastName}";
                         await next();
                     });
+                });
             });
 
             var commandDispatcher = provider.GetRequiredService<ICommandDispatcher>();
@@ -195,15 +209,17 @@ namespace Developist.Core.Cqrs.Tests
             bool serviceProviderSupplied = false;
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddCommandHandler<AddUserCommand>((command, token) => Task.CompletedTask)
-                    .AddCommandInterceptor((AddUserCommand command, HandlerDelegate next, IServiceProvider provider, CancellationToken token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddCommandHandler<AddUserCommand>((command, token) => Task.CompletedTask);
+                    builder.AddCommandInterceptor((AddUserCommand command, HandlerDelegate next, IServiceProvider provider, CancellationToken token) =>
                     {
                         serviceProviderSupplied = provider is not null;
                         return next();
                     });
+                });
             });
 
             var commandInterceptor = provider.GetService<ICommandInterceptor<AddUserCommand>>();
@@ -218,13 +234,15 @@ namespace Developist.Core.Cqrs.Tests
         {
             using var provider = ConfigureServiceProvider(services =>
             {
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddEventHandler<UserLoggedIn>((@event, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddEventHandler<UserLoggedIn>((@event, token) =>
                     {
                         return Task.CompletedTask;
                     });
+                });
             });
 
             var eventHandlers = provider.GetServices<IEventHandler<UserLoggedIn>>();
@@ -238,15 +256,17 @@ namespace Developist.Core.Cqrs.Tests
             using var provider = ConfigureServiceProvider(services =>
             {
                 services.AddSingleton<UserRepository>();
-                services.ConfigureCqrs()
-                    .AddDefaultDispatcher()
-                    .AddDefaultRegistry()
-                    .AddEventHandler<UserLoggedIn>((@event, provider, token) =>
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDefaultDispatcher();
+                    builder.AddDefaultRegistry();
+                    builder.AddEventHandler<UserLoggedIn>((@event, provider, token) =>
                     {
                         var repository = provider.GetRequiredService<UserRepository>();
                         loggedInUser = repository.FirstOrDefault(u => u.UserName.Equals(@event.UserName));
                         return Task.CompletedTask;
                     });
+                });
             });
 
             var eventDispatcher = provider.GetRequiredService<IEventDispatcher>();

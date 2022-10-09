@@ -15,10 +15,7 @@ namespace Developist.Core.Cqrs.Tests
         private static ServiceProvider CreateServiceProvider()
         {
             var services = new ServiceCollection();
-            services.ConfigureCqrs()
-                .AddDefaultDispatcher()
-                .AddDefaultRegistry();
-
+            services.AddCqrs(builder => builder.AddDefaultDispatcher().AddDefaultRegistry());
             return services.BuildServiceProvider();
         }
 
@@ -66,10 +63,11 @@ namespace Developist.Core.Cqrs.Tests
         public void AddHandlersFromAssembly_GivenNullAssembly_ThrowsArgumentNullException()
         {
             // Arrange
-            CqrsConfigurationBuilder builder = (CqrsConfigurationBuilder)new ServiceCollection().ConfigureCqrs();
-            
+            CqrsBuilder builder = default!;
+            new ServiceCollection().AddCqrs(b => builder = b);
+
             // Act
-            void action() => ((IHandlerConfiguration)builder).AddHandlersFromAssembly(null!);
+            void action() => builder.AddHandlersFromAssembly(null!);
 
             // Assert
             var exception = Assert.ThrowsException<ArgumentNullException>(action);
@@ -80,10 +78,11 @@ namespace Developist.Core.Cqrs.Tests
         public void AddInterceptorsFromAssembly_GivenNullAssembly_ThrowsArgumentNullException()
         {
             // Arrange
-            CqrsConfigurationBuilder builder = (CqrsConfigurationBuilder)new ServiceCollection().ConfigureCqrs();
+            CqrsBuilder builder = default!;
+            new ServiceCollection().AddCqrs(b => builder = b);
 
             // Act
-            void action() => ((IInterceptorConfiguration)builder).AddInterceptorsFromAssembly(null!);
+            void action() => builder.AddInterceptorsFromAssembly(null!);
 
             // Assert
             var exception = Assert.ThrowsException<ArgumentNullException>(action);
