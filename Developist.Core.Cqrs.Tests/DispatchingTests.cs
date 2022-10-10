@@ -93,5 +93,65 @@ namespace Developist.Core.Cqrs.Tests
             Assert.IsInstanceOfType(sampleQueryDelegate, typeof(DispatcherDelegate<SampleQuery, SampleQueryResult>));
             Assert.IsTrue(log.Any());
         }
+
+        [TestMethod]
+        public async Task DispatchAsync_GivenBaseEvent_DispatchesOnlyToBaseEventHandler()
+        {
+            // Arrange
+            using var provider = CreateServiceProvider();
+            IEventDispatcher dispatcher = provider.GetRequiredService<IEventDispatcher>();
+
+            // Act
+            await dispatcher.DispatchAsync(new BaseEvent());
+
+            // Assert
+            Assert.IsTrue(log.Contains(typeof(BaseEventHandler)));
+            Assert.IsFalse(log.Contains(typeof(DerivedEventHandler)));
+        }
+
+        [TestMethod]
+        public async Task DispatchAsync_GivenBaseEventAsIEvent_DispatchesOnlyToGenericEventHandler()
+        {
+            // Arrange
+            using var provider = CreateServiceProvider();
+            IEventDispatcher dispatcher = provider.GetRequiredService<IEventDispatcher>();
+
+            // Act
+            await dispatcher.DispatchAsync((IEvent)new BaseEvent());
+
+            // Assert
+            Assert.AreEqual(1, log.Count);
+            Assert.AreEqual(typeof(GenericEventHandler<IEvent>), log.Single());
+        }
+
+        [TestMethod]
+        public async Task DispatchAsync_GivenDerivedEvent_DispatchesOnlyToDerivedEventHandler()
+        {
+            // Arrange
+            using var provider = CreateServiceProvider();
+            IEventDispatcher dispatcher = provider.GetRequiredService<IEventDispatcher>();
+
+            // Act
+            await dispatcher.DispatchAsync(new DerivedEvent());
+
+            // Assert
+            Assert.IsFalse(log.Contains(typeof(BaseEventHandler)));
+            Assert.IsTrue(log.Contains(typeof(DerivedEventHandler)));
+        }
+
+        [TestMethod]
+        public async Task DispatchAsync_GivenDerivedEventAsIEvent_DispatchesOnlyToGenericEventHandler()
+        {
+            // Arrange
+            using var provider = CreateServiceProvider();
+            IEventDispatcher dispatcher = provider.GetRequiredService<IEventDispatcher>();
+
+            // Act
+            await dispatcher.DispatchAsync((IEvent)new DerivedEvent());
+
+            // Assert
+            Assert.AreEqual(1, log.Count);
+            Assert.AreEqual(typeof(GenericEventHandler<IEvent>), log.Single());
+        }
     }
 }
