@@ -147,7 +147,7 @@ namespace Developist.Core.Cqrs
                 }
                 catch (TargetInvocationException exception)
                 {
-                    ExceptionDispatchInfo.Capture(exception.InnerException!).Throw();
+                    ExceptionDispatchInfo.Throw(exception.InnerException!);
 
                     // Redundant, but compiler cannot infer that ExceptionDispatchInfo.Throw() actually throws.
                     return Task.FromException<TResult>(exception.InnerException);
@@ -197,7 +197,7 @@ namespace Developist.Core.Cqrs
                 }
                 catch (TargetInvocationException exception)
                 {
-                    ExceptionDispatchInfo.Capture(exception.InnerException!).Throw();
+                    ExceptionDispatchInfo.Throw(exception.InnerException!);
 
                     // Redundant, but compiler cannot infer that ExceptionDispatchInfo.Throw() actually throws.
                     return Task.FromException<TResult>(exception.InnerException);
