@@ -112,7 +112,8 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
+                    builder.AddDynamicDispatcher();
                     builder.AddQueryHandler<SampleQuery, SampleQueryResult, SampleQueryHandler>();
                     builder.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithLowPriority>();
                     builder.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithHighestMinusThreePriority>();
@@ -132,6 +133,26 @@ namespace Developist.Core.Cqrs.Tests
             // Arrange
             using var provider = CreateServiceProviderWithDefaultConfiguration();
             var queryDispatcher = provider.GetRequiredService<IQueryDispatcher>();
+
+            // Act
+            SampleQueryResult result = await queryDispatcher.DispatchAsync<SampleQuery, SampleQueryResult>(new SampleQuery());
+
+            // Assert
+            Assert.AreEqual(typeof(SampleQueryInterceptorWithHighestPriority), log.Dequeue());
+            Assert.AreEqual(typeof(SampleQueryInterceptorWithHighestMinusThreePriority), log.Dequeue());
+            Assert.AreEqual(typeof(SampleQueryInterceptorWithVeryHighPriority), log.Dequeue());
+            Assert.AreEqual(typeof(SampleQueryInterceptorWithHighPriority), log.Dequeue());
+            Assert.AreEqual(typeof(SampleQueryInterceptorWithLowPriority), log.Dequeue());
+            Assert.AreEqual(typeof(SampleQueryInterceptorWithLowerPriority), log.Dequeue());
+            Assert.AreEqual(typeof(SampleQueryHandler), log.Dequeue());
+        }
+
+        [TestMethod]
+        public async Task DynamicDispatchAsync_GivenSampleQuery_RunsInterceptorsInExpectedOrder()
+        {
+            // Arrange
+            using var provider = CreateServiceProviderWithDefaultConfiguration();
+            var queryDispatcher = provider.GetRequiredService<IDynamicQueryDispatcher>();
 
             // Act
             SampleQueryResult result = await queryDispatcher.DispatchAsync(new SampleQuery());

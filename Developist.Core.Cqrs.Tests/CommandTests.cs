@@ -51,7 +51,8 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
+                    builder.AddDynamicDispatcher();
                     builder.AddCommandHandler<BaseCommand, BaseCommandHandler>();
                     builder.AddCommandHandler<DerivedCommand, DerivedCommandHandler>();
                 });

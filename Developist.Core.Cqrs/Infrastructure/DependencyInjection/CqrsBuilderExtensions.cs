@@ -14,15 +14,24 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
 {
     public static partial class CqrsBuilderExtensions
     {
-        public static CqrsBuilder AddDefaultDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IDispatcher), typeof(Dispatcher), lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(typeof(ICommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IQueryDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
 
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicCommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), typeof(HandlerRegistry), lifetime));
+
+            return builder;
+        }
+
+        public static CqrsBuilder AddDynamicDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        {
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicDispatcher), typeof(DynamicDispatcher), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicCommandDispatcher), provider => provider.GetRequiredService<IDynamicDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicEventDispatcher), provider => provider.GetRequiredService<IDynamicDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicQueryDispatcher), provider => provider.GetRequiredService<IDynamicDispatcher>(), lifetime));
 
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), typeof(HandlerRegistry), lifetime));
 

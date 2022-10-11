@@ -75,7 +75,8 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
+                    builder.AddDynamicDispatcher();
                     builder.AddEventHandler<BaseEvent, BaseEventHandler>();
                     builder.AddEventHandler<DerivedEvent, DerivedEventHandler>();
                     builder.AddEventHandler<SampleEvent, SampleEventHandler>();
@@ -92,9 +93,9 @@ namespace Developist.Core.Cqrs.Tests
             // Arrange
             using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
             var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
+            
             // Act
-            Task action() => eventDispatcher.DispatchAsync(null!);
+            Task action() => eventDispatcher.DispatchAsync<SampleEvent>(null!);
 
             // Assert
             var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);

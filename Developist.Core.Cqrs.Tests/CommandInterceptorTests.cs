@@ -110,7 +110,8 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
+                    builder.AddDynamicDispatcher();
                     builder.AddCommandHandler<SampleCommand, SampleCommandHandler>();
                     builder.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithHighestPriority>();
                     builder.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithLowestPriority>();

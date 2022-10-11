@@ -65,60 +65,101 @@ namespace Developist.Core.Cqrs.Tests
         #endregion
 
         [TestMethod]
-        public void AddDefaultDispatcher_RegistersAllDispatcherInterfaces()
+        public void AddDispatcher_RegistersAllDispatcherInterfaces()
         {
             // Arrange
             using var serviceProvider = ConfigureServiceProvider(services =>
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
                 });
             });
 
             // Act
             IDispatcher? dispatcher = serviceProvider.GetService<IDispatcher>();
-            IDynamicCommandDispatcher? dynamicCommandDispatcher = serviceProvider.GetService<IDynamicCommandDispatcher>();
             ICommandDispatcher? commandDispatcher = serviceProvider.GetService<ICommandDispatcher>();
             IQueryDispatcher? queryDispatcher = serviceProvider.GetService<IQueryDispatcher>();
-            IDynamicEventDispatcher? dynamicEventDispatcher = serviceProvider.GetService<IDynamicEventDispatcher>();
             IEventDispatcher? eventDispatcher = serviceProvider.GetService<IEventDispatcher>();
 
             // Assert
             Assert.IsNotNull(dispatcher);
-            Assert.IsNotNull(dynamicCommandDispatcher);
             Assert.IsNotNull(commandDispatcher);
             Assert.IsNotNull(queryDispatcher);
-            Assert.IsNotNull(dynamicEventDispatcher);
             Assert.IsNotNull(eventDispatcher);
         }
 
         [TestMethod]
-        public void AddDefaultDispatcher_RegistersSingleDispatcherInstance()
+        public void AddDynamicDispatcher_RegistersAllDynamicDispatcherInterfaces()
         {
             // Arrange
             using var serviceProvider = ConfigureServiceProvider(services =>
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDynamicDispatcher();
+                });
+            });
+
+            // Act
+            IDynamicDispatcher? dispatcher = serviceProvider.GetService<IDynamicDispatcher>();
+            IDynamicCommandDispatcher? commandDispatcher = serviceProvider.GetService<IDynamicCommandDispatcher>();
+            IDynamicEventDispatcher? eventDispatcher = serviceProvider.GetService<IDynamicEventDispatcher>();
+            IDynamicQueryDispatcher? queryDispatcher = serviceProvider.GetService<IDynamicQueryDispatcher>();
+
+            // Assert
+            Assert.IsNotNull(dispatcher);
+            Assert.IsNotNull(commandDispatcher);
+            Assert.IsNotNull(eventDispatcher);
+            Assert.IsNotNull(queryDispatcher);
+        }
+
+        [TestMethod]
+        public void AddDispatcher_RegistersSingleDispatcherInstance()
+        {
+            // Arrange
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
                 });
             });
 
             // Act
             IDispatcher dispatcher = serviceProvider.GetRequiredService<IDispatcher>();
-            IDynamicCommandDispatcher dynamicCommandDispatcher = serviceProvider.GetRequiredService<IDynamicCommandDispatcher>();
             ICommandDispatcher commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
             IQueryDispatcher queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
-            IDynamicEventDispatcher dynamicEventDispatcher = serviceProvider.GetRequiredService<IDynamicEventDispatcher>();
             IEventDispatcher eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
 
             // Assert
-            Assert.AreEqual(dispatcher, dynamicCommandDispatcher);
             Assert.AreEqual(dispatcher, commandDispatcher);
             Assert.AreEqual(dispatcher, queryDispatcher);
-            Assert.AreEqual(dispatcher, dynamicEventDispatcher);
             Assert.AreEqual(dispatcher, eventDispatcher);
+        }
+
+        [TestMethod]
+        public void AddDynamicDispatcher_RegistersSingleDynamicDispatcherInstance()
+        {
+            // Arrange
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDynamicDispatcher();
+                });
+            });
+
+            // Act
+            IDynamicDispatcher dispatcher = serviceProvider.GetRequiredService<IDynamicDispatcher>();
+            IDynamicCommandDispatcher commandDispatcher = serviceProvider.GetRequiredService<IDynamicCommandDispatcher>();
+            IDynamicEventDispatcher eventDispatcher = serviceProvider.GetRequiredService<IDynamicEventDispatcher>();
+            IDynamicQueryDispatcher queryDispatcher = serviceProvider.GetRequiredService<IDynamicQueryDispatcher>();
+
+            // Assert
+            Assert.AreEqual(dispatcher, commandDispatcher);
+            Assert.AreEqual(dispatcher, eventDispatcher);
+            Assert.AreEqual(dispatcher, queryDispatcher);
         }
 
         [TestMethod]
@@ -175,7 +216,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
                     builder.AddHandlersFromAssembly(GetType().Assembly);
                 });
             });
@@ -198,7 +239,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
                 });
 
                 services.AddScoped<ICommandHandler<CommandWithMultipleHandlers>, CommandWithMultipleHandlersFirstHandler>();
@@ -223,7 +264,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
                     builder.AddHandlersFromAssembly(GetType().Assembly);
                 });
             });
@@ -246,7 +287,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
                 });
 
                 services.AddScoped<IQueryHandler<QueryWithMultipleHandlers, SampleQueryResult>, QueryWithMultipleHandlersFirstHandler>();

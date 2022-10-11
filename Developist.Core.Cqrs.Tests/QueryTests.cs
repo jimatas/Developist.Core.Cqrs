@@ -52,7 +52,8 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
+                    builder.AddDynamicDispatcher();
                     builder.AddQueryHandler<BaseQuery, QueryResult, BaseQueryHandler>();
                     builder.AddQueryHandler<DerivedQuery, QueryResult, DerivedQueryHandler>();
                 });
@@ -69,7 +70,22 @@ namespace Developist.Core.Cqrs.Tests
             var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
 
             // Act
-            Task action() => queryDispatcher.DispatchAsync<IQuery<QueryResult>>(null!);
+            Task action() => queryDispatcher.DispatchAsync<BaseQuery, QueryResult>(null!);
+
+            // Assert
+            var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
+            Assert.AreEqual("Value cannot be null. (Parameter 'query')", exception.Message);
+        }
+
+        [TestMethod]
+        public async Task DynamicDispatchAsync_GivenNull_ThrowsNullArgumentException()
+        {
+            // Arrange
+            using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
+            var queryDispatcher = serviceProvider.GetRequiredService<IDynamicQueryDispatcher>();
+
+            // Act
+            Task action() => queryDispatcher.DispatchAsync((BaseQuery)null!);
 
             // Assert
             var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
@@ -82,6 +98,21 @@ namespace Developist.Core.Cqrs.Tests
             // Arrange
             using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
             var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+
+            // Act
+            await queryDispatcher.DispatchAsync<BaseQuery, QueryResult>(new BaseQuery());
+
+            // Assert
+            Assert.AreEqual(1, log.Count);
+            Assert.AreEqual(typeof(BaseQueryHandler), log.Single());
+        }
+
+        [TestMethod]
+        public async Task DynamicDispatchAsync_GivenBaseQuery_DispatchesToBaseQueryHandler()
+        {
+            // Arrange
+            using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
+            var queryDispatcher = serviceProvider.GetRequiredService<IDynamicQueryDispatcher>();
 
             // Act
             await queryDispatcher.DispatchAsync(new BaseQuery());
@@ -97,6 +128,21 @@ namespace Developist.Core.Cqrs.Tests
             // Arrange
             using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
             var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+
+            // Act
+            await queryDispatcher.DispatchAsync<DerivedQuery, QueryResult>(new DerivedQuery());
+
+            // Assert
+            Assert.AreEqual(1, log.Count);
+            Assert.AreEqual(typeof(DerivedQueryHandler), log.Single());
+        }
+
+        [TestMethod]
+        public async Task DynamicDispatchAsync_GivenDerivedQuery_DispatchesToDerivedQueryHandler()
+        {
+            // Arrange
+            using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
+            var queryDispatcher = serviceProvider.GetRequiredService<IDynamicQueryDispatcher>();
 
             // Act
             await queryDispatcher.DispatchAsync(new DerivedQuery());

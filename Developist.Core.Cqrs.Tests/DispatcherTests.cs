@@ -30,7 +30,7 @@ namespace Developist.Core.Cqrs.Tests
             {
                 services.AddCqrs(builder =>
                 {
-                    builder.AddDefaultDispatcher();
+                    builder.AddDispatcher();
                     builder.AddHandlersFromAssembly(GetType().Assembly);
                 });
                 services.AddScoped(_ => log);
