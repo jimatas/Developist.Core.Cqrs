@@ -3,41 +3,84 @@ using Developist.Core.Cqrs.Events;
 using Developist.Core.Cqrs.Infrastructure;
 using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
 using Developist.Core.Cqrs.Queries;
-using Developist.Core.Cqrs.Tests.Fixture;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using System.Reflection;
+using static Developist.Core.Cqrs.Tests.CommandInterceptorTests;
+using static Developist.Core.Cqrs.Tests.EventTests;
+using static Developist.Core.Cqrs.Tests.QueryInterceptorTests;
 
 namespace Developist.Core.Cqrs.Tests
 {
     [TestClass]
     public class RegistrationTests
     {
-        private static ServiceProvider CreateServiceProvider()
-        {
-            var services = new ServiceCollection();
-            services.ConfigureCqrs()
-                .AddDefaultDispatcher()
-                .AddDefaultRegistry()
-                .AddHandlersFromAssembly(Assembly.GetExecutingAssembly())
-                .AddInterceptorsFromAssembly(Assembly.GetExecutingAssembly());
+        #region Fixture
+        public record CommandWithoutHandler : ICommand { }
+        public record CommandWithMultipleHandlers : ICommand { }
 
-            services.AddScoped(_ => new Queue<Type>());
-            return services.BuildServiceProvider();
+        public class CommandWithMultipleHandlersFirstHandler : ICommandHandler<CommandWithMultipleHandlers>
+        {
+            public Task HandleAsync(CommandWithMultipleHandlers command, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
         }
 
+        public class CommandWithMultipleHandlersSecondHandler : ICommandHandler<CommandWithMultipleHandlers>
+        {
+            public Task HandleAsync(CommandWithMultipleHandlers command, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public record QueryWithoutHandler : IQuery<SampleQueryResult> { }
+        public record QueryWithMultipleHandlers : IQuery<SampleQueryResult> { }
+
+        public class QueryWithMultipleHandlersFirstHandler : IQueryHandler<QueryWithMultipleHandlers, SampleQueryResult>
+        {
+            public Task<SampleQueryResult> HandleAsync(QueryWithMultipleHandlers query, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public class QueryWithMultipleHandlersSecondHandler : IQueryHandler<QueryWithMultipleHandlers, SampleQueryResult>
+        {
+            public Task<SampleQueryResult> HandleAsync(QueryWithMultipleHandlers query, CancellationToken cancellationToken)
+            {
+                throw new NotImplementedException();
+            }
+        }
+        #endregion
+
+        #region Setup
+        private static ServiceProvider ConfigureServiceProvider(Action<IServiceCollection> configureServices)
+        {
+            var services = new ServiceCollection();
+            configureServices(services);
+            return services.BuildServiceProvider();
+        }
+        #endregion
+
         [TestMethod]
-        public void AddDefaultDispatcher_RegistersAllDispatcherInterfaces()
+        public void AddDispatcher_RegistersAllDispatcherInterfaces()
         {
             // Arrange
-            using var provider = CreateServiceProvider();
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
+                });
+            });
 
             // Act
-            IDispatcher? dispatcher = provider.GetService<IDispatcher>();
-            ICommandDispatcher? commandDispatcher = provider.GetService<ICommandDispatcher>();
-            IQueryDispatcher? queryDispatcher = provider.GetService<IQueryDispatcher>();
-            IEventDispatcher? eventDispatcher = provider.GetService<IEventDispatcher>();
+            IDispatcher? dispatcher = serviceProvider.GetService<IDispatcher>();
+            ICommandDispatcher? commandDispatcher = serviceProvider.GetService<ICommandDispatcher>();
+            IQueryDispatcher? queryDispatcher = serviceProvider.GetService<IQueryDispatcher>();
+            IEventDispatcher? eventDispatcher = serviceProvider.GetService<IEventDispatcher>();
 
             // Assert
             Assert.IsNotNull(dispatcher);
@@ -47,16 +90,47 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void AddDefaultDispatcher_RegistersSingleDispatcherInstance()
+        public void AddDynamicDispatcher_RegistersAllDynamicDispatcherInterfaces()
         {
             // Arrange
-            using var provider = CreateServiceProvider();
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDynamicDispatcher();
+                });
+            });
 
             // Act
-            IDispatcher dispatcher = provider.GetRequiredService<IDispatcher>();
-            ICommandDispatcher commandDispatcher = provider.GetRequiredService<ICommandDispatcher>();
-            IQueryDispatcher queryDispatcher = provider.GetRequiredService<IQueryDispatcher>();
-            IEventDispatcher eventDispatcher = provider.GetRequiredService<IEventDispatcher>();
+            IDynamicDispatcher? dispatcher = serviceProvider.GetService<IDynamicDispatcher>();
+            IDynamicCommandDispatcher? commandDispatcher = serviceProvider.GetService<IDynamicCommandDispatcher>();
+            IDynamicEventDispatcher? eventDispatcher = serviceProvider.GetService<IDynamicEventDispatcher>();
+            IDynamicQueryDispatcher? queryDispatcher = serviceProvider.GetService<IDynamicQueryDispatcher>();
+
+            // Assert
+            Assert.IsNotNull(dispatcher);
+            Assert.IsNotNull(commandDispatcher);
+            Assert.IsNotNull(eventDispatcher);
+            Assert.IsNotNull(queryDispatcher);
+        }
+
+        [TestMethod]
+        public void AddDispatcher_RegistersSingleDispatcherInstance()
+        {
+            // Arrange
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
+                });
+            });
+
+            // Act
+            IDispatcher dispatcher = serviceProvider.GetRequiredService<IDispatcher>();
+            ICommandDispatcher commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+            IQueryDispatcher queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+            IEventDispatcher eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
 
             // Assert
             Assert.AreEqual(dispatcher, commandDispatcher);
@@ -65,15 +139,46 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
+        public void AddDynamicDispatcher_RegistersSingleDynamicDispatcherInstance()
+        {
+            // Arrange
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDynamicDispatcher();
+                });
+            });
+
+            // Act
+            IDynamicDispatcher dispatcher = serviceProvider.GetRequiredService<IDynamicDispatcher>();
+            IDynamicCommandDispatcher commandDispatcher = serviceProvider.GetRequiredService<IDynamicCommandDispatcher>();
+            IDynamicEventDispatcher eventDispatcher = serviceProvider.GetRequiredService<IDynamicEventDispatcher>();
+            IDynamicQueryDispatcher queryDispatcher = serviceProvider.GetRequiredService<IDynamicQueryDispatcher>();
+
+            // Assert
+            Assert.AreEqual(dispatcher, commandDispatcher);
+            Assert.AreEqual(dispatcher, eventDispatcher);
+            Assert.AreEqual(dispatcher, queryDispatcher);
+        }
+
+        [TestMethod]
         public void AddHandlersFromAssembly_RegistersHandlers()
         {
             // Arrange
-            using var provider = CreateServiceProvider();
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddScoped(_ => new Queue<Type>());
+                services.AddCqrs(builder =>
+                {
+                    builder.AddHandlersFromAssembly(GetType().Assembly);
+                });
+            });
 
             // Act
-            var sampleCommandHandler = provider.GetService<ICommandHandler<SampleCommand>>();
-            var sampleQueryHandler = provider.GetService<IQueryHandler<SampleQuery, SampleQueryResult>>();
-            var sampleEventHandlers = provider.GetServices<IEventHandler<SampleEvent>>();
+            var sampleCommandHandler = serviceProvider.GetService<ICommandHandler<SampleCommand>>();
+            var sampleQueryHandler = serviceProvider.GetService<IQueryHandler<SampleQuery, SampleQueryResult>>();
+            var sampleEventHandlers = serviceProvider.GetServices<IEventHandler<SampleEvent>>();
 
             // Assert
             Assert.IsNotNull(sampleCommandHandler);
@@ -85,11 +190,18 @@ namespace Developist.Core.Cqrs.Tests
         public void AddInterceptorsFromAssembly_RegistersInterceptors()
         {
             // Arrange
-            using var provider = CreateServiceProvider();
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddScoped(_ => new Queue<Type>());
+                services.AddCqrs(builder =>
+                {
+                    builder.AddHandlersFromAssembly(GetType().Assembly);
+                });
+            });
 
             // Act
-            var sampleCommandInterceptors = provider.GetServices<ICommandInterceptor<SampleCommand>>();
-            var sampleQueryInterceptors = provider.GetServices<IQueryInterceptor<SampleQuery, SampleQueryResult>>();
+            var sampleCommandInterceptors = serviceProvider.GetServices<ICommandInterceptor<SampleCommand>>();
+            var sampleQueryInterceptors = serviceProvider.GetServices<IQueryInterceptor<SampleQuery, SampleQueryResult>>();
 
             // Assert
             Assert.IsTrue(sampleCommandInterceptors.Any());
@@ -97,33 +209,99 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
-        public void GetCommandHandler_CommandWithoutHandler_ThrowsInvalidOperationException()
+        public void GetCommandHandler_GivenCommandWithoutHandler_ThrowsInvalidOperationException()
         {
             // Arrange
-            using var provider = CreateServiceProvider();
-            var handlerRegistry = provider.GetRequiredService<IHandlerRegistry>();
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
+                    builder.AddHandlersFromAssembly(GetType().Assembly);
+                });
+            });
+
+            var handlerRegistry = serviceProvider.GetRequiredService<IHandlerRegistry>();
 
             // Act
             void action() => handlerRegistry.GetCommandHandler(typeof(CommandWithoutHandler));
 
             // Assert
             var exception = Assert.ThrowsException<InvalidOperationException>(action);
-            Assert.AreEqual($"No handler found for command with type {typeof(CommandWithoutHandler)}.", exception.Message);
+            Assert.AreEqual($"No handler found for command with type '{typeof(CommandWithoutHandler)}'.", exception.Message);
         }
 
         [TestMethod]
-        public void GetCommandHandler_CommandWithMultipleHandlers_ThrowsInvalidOperationException()
+        public void GetCommandHandler_GivenCommandWithMultipleHandlers_ThrowsInvalidOperationException()
         {
             // Arrange
-            using var provider = CreateServiceProvider();
-            var handlerRegistry = provider.GetRequiredService<IHandlerRegistry>();
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
+                });
+
+                services.AddScoped<ICommandHandler<CommandWithMultipleHandlers>, CommandWithMultipleHandlersFirstHandler>();
+                services.AddScoped<ICommandHandler<CommandWithMultipleHandlers>, CommandWithMultipleHandlersSecondHandler>();
+            });
+
+            var handlerRegistry = serviceProvider.GetRequiredService<IHandlerRegistry>();
 
             // Act
             void action() => handlerRegistry.GetCommandHandler(typeof(CommandWithMultipleHandlers));
 
             // Assert
             var exception = Assert.ThrowsException<InvalidOperationException>(action);
-            Assert.AreEqual($"More than one handler found for command with type {typeof(CommandWithMultipleHandlers)}.", exception.Message);
+            Assert.AreEqual($"More than one handler found for command with type '{typeof(CommandWithMultipleHandlers)}'.", exception.Message);
+        }
+
+        [TestMethod]
+        public void GetQueryHandler_GivenQueryWithoutHandler_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
+                    builder.AddHandlersFromAssembly(GetType().Assembly);
+                });
+            });
+
+            var handlerRegistry = serviceProvider.GetRequiredService<IHandlerRegistry>();
+
+            // Act
+            void action() => handlerRegistry.GetQueryHandler(typeof(QueryWithoutHandler), typeof(SampleQueryResult));
+
+            // Assert
+            var exception = Assert.ThrowsException<InvalidOperationException>(action);
+            Assert.AreEqual($"No handler found for query with type '{typeof(QueryWithoutHandler)}'.", exception.Message);
+        }
+
+        [TestMethod]
+        public void GetQueryHandler_GivenQueryWithMultipleHandlers_ThrowsInvalidOperationException()
+        {
+            // Arrange
+            using var serviceProvider = ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddDispatcher();
+                });
+
+                services.AddScoped<IQueryHandler<QueryWithMultipleHandlers, SampleQueryResult>, QueryWithMultipleHandlersFirstHandler>();
+                services.AddScoped<IQueryHandler<QueryWithMultipleHandlers, SampleQueryResult>, QueryWithMultipleHandlersSecondHandler>();
+            });
+
+            var handlerRegistry = serviceProvider.GetRequiredService<IHandlerRegistry>();
+
+            // Act
+            void action() => handlerRegistry.GetQueryHandler(typeof(QueryWithMultipleHandlers), typeof(SampleQueryResult));
+
+            // Assert
+            var exception = Assert.ThrowsException<InvalidOperationException>(action);
+            Assert.AreEqual($"More than one handler found for query with type '{typeof(QueryWithMultipleHandlers)}'.", exception.Message);
         }
     }
 }

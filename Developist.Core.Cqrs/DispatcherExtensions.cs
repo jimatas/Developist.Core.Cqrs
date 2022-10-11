@@ -21,7 +21,7 @@ namespace Developist.Core.Cqrs
         public static DispatcherDelegate<TQuery, TResult> CreateDelegate<TQuery, TResult>(this IQueryDispatcher queryDispatcher)
             where TQuery : IQuery<TResult>
         {
-            return (query, cancellationToken) => queryDispatcher.DispatchAsync(query, cancellationToken);
+            return (query, cancellationToken) => queryDispatcher.DispatchAsync<TQuery, TResult>(query, cancellationToken);
         }
     }
 }
