@@ -45,7 +45,7 @@ namespace Developist.Core.Cqrs.Infrastructure
             var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, resultType);
             var handlers = serviceProvider.GetServices(handlerType).Cast<object>();
             return handlers.Count() == 1 ? handlers.Single()
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{queryType}'.");
+                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{queryType}' and result type '{resultType}'.");
         }
 
         public IEnumerable<object> GetQueryInterceptors(Type queryType, Type resultType)
