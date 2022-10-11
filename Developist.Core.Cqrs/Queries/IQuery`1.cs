@@ -1,6 +1,6 @@
 ﻿namespace Developist.Core.Cqrs.Queries
 {
-    public interface IQuery<TResult>
+    public interface IQuery<out TResult>
     {
     }
 }

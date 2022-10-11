@@ -16,19 +16,15 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
     {
         public static CqrsBuilder AddDefaultDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDispatcher), typeof(DefaultDispatcher), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDispatcher), typeof(Dispatcher), lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(typeof(ICommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IQueryDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
 
-            return builder;
-        }
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicCommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
 
-        public static CqrsBuilder AddDefaultRegistry(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
-        {
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(DefaultRegistry), typeof(DefaultRegistry), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), provider => provider.GetRequiredService<DefaultRegistry>(), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IInterceptorRegistry), provider => provider.GetRequiredService<DefaultRegistry>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), typeof(HandlerRegistry), lifetime));
 
             return builder;
         }
@@ -37,23 +33,40 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         {
             ArgumentNullExceptionHelper.ThrowIfNull(() => assembly);
 
-            foreach (var openGenericInterface in new[] { typeof(ICommandHandler<>), typeof(IEventHandler<>), typeof(IQueryHandler<,>) })
+            foreach (var (openGenericInterface, isEnumerable) in new[]
+            {
+                (typeof(ICommandHandler<>), false),
+                (typeof(ICommandInterceptor<>), true),
+                (typeof(IEventHandler<>), true),
+                (typeof(IQueryHandler<,>), false),
+                (typeof(IQueryInterceptor<,>), true)
+            })
             {
                 foreach (var type in assembly.ExportedTypes.Where(type => type.IsConcrete()))
                 {
                     foreach (var implementedInterface in type.GetImplementedGenericInterfaces(openGenericInterface))
                     {
+                        ServiceDescriptor service;
                         if (!type.IsGenericType)
                         {
-                            builder.Services.Add(new ServiceDescriptor(implementedInterface, type, lifetime));
+                            service = new ServiceDescriptor(implementedInterface, type, lifetime);
                         }
                         else if (implementedInterface.GetGenericArguments().All(arg => arg.IsGenericParameter))
                         {
-                            builder.Services.Add(new ServiceDescriptor(openGenericInterface, type, lifetime));
+                            service = new ServiceDescriptor(openGenericInterface, type, lifetime);
                         }
                         else
                         {
-                            throw new InvalidOperationException("Types that only partially close the IQueryHandler generic interface are not supported.");
+                            throw new InvalidOperationException($"Types that only partially close the {nameof(IQueryHandler<IQuery<object>, object>)} or {nameof(IQueryInterceptor<IQuery<object>, object>)} generic interface are not supported.");
+                        }
+
+                        if (isEnumerable)
+                        {
+                            builder.Services.TryAddEnumerable(service);
+                        }
+                        else
+                        {
+                            builder.Services.TryAdd(service);
                         }
                     }
                 }
@@ -62,32 +75,48 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
             return builder;
         }
 
-        public static CqrsBuilder AddInterceptorsFromAssembly(this CqrsBuilder builder, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddCommandHandler<TCommand, TCommandHandler>(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+            where TCommand : ICommand
+            where TCommandHandler : ICommandHandler<TCommand>
         {
-            ArgumentNullExceptionHelper.ThrowIfNull(() => assembly);
+            var service = new ServiceDescriptor(typeof(ICommandHandler<TCommand>), typeof(TCommandHandler), lifetime);
+            builder.Services.TryAdd(service);
+            return builder;
+        }
 
-            foreach (var openGenericInterface in new[] { typeof(ICommandInterceptor<>), typeof(IQueryInterceptor<,>) })
-            {
-                foreach (var type in assembly.ExportedTypes.Where(type => type.IsConcrete()))
-                {
-                    foreach (var implementedInterface in type.GetImplementedGenericInterfaces(openGenericInterface))
-                    {
-                        if (!type.IsGenericType)
-                        {
-                            builder.Services.Add(new ServiceDescriptor(implementedInterface, type, lifetime));
-                        }
-                        else if (implementedInterface.GetGenericArguments().All(arg => arg.IsGenericParameter))
-                        {
-                            builder.Services.Add(new ServiceDescriptor(openGenericInterface, type, lifetime));
-                        }
-                        else
-                        {
-                            throw new InvalidOperationException("Types that only partially close the IQueryInterceptor generic interface are not supported.");
-                        }
-                    }
-                }
-            }
+        public static CqrsBuilder AddCommandInterceptor<TCommand, TCommandInterceptor>(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+            where TCommand : ICommand
+            where TCommandInterceptor : ICommandInterceptor<TCommand>
+        {
+            var service = new ServiceDescriptor(typeof(ICommandInterceptor<TCommand>), typeof(TCommandInterceptor), lifetime);
+            builder.Services.TryAddEnumerable(service);
+            return builder;
+        }
 
+        public static CqrsBuilder AddEventHandler<TEvent, TEventHandler>(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+            where TEvent : IEvent
+            where TEventHandler : IEventHandler<TEvent>
+        {
+            var service = new ServiceDescriptor(typeof(IEventHandler<TEvent>), typeof(TEventHandler), lifetime);
+            builder.Services.TryAddEnumerable(service);
+            return builder;
+        }
+
+        public static CqrsBuilder AddQueryHandler<TQuery, TResult, TQueryHandler>(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+            where TQuery : IQuery<TResult>
+            where TQueryHandler : IQueryHandler<TQuery, TResult>
+        {
+            var service = new ServiceDescriptor(typeof(IQueryHandler<TQuery, TResult>), typeof(TQueryHandler), lifetime);
+            builder.Services.TryAdd(service);
+            return builder;
+        }
+
+        public static CqrsBuilder AddQueryInterceptor<TQuery, TResult, TQueryInterceptor>(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+            where TQuery : IQuery<TResult>
+            where TQueryInterceptor : IQueryInterceptor<TQuery, TResult>
+        {
+            var service = new ServiceDescriptor(typeof(IQueryInterceptor<TQuery, TResult>), typeof(TQueryInterceptor), lifetime);
+            builder.Services.TryAddEnumerable(service);
             return builder;
         }
     }
