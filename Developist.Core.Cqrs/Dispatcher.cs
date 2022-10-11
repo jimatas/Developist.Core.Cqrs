@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs
 {
-    public sealed class Dispatcher : DynamicDispatcherBase, IDispatcher
+    public sealed class Dispatcher : DynamicDispatcher, IDispatcher
     {
         public Dispatcher(IHandlerRegistry registry, ILogger<Dispatcher>? logger = null)
             : base(registry, logger) { }

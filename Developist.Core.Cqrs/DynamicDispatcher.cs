@@ -14,9 +14,9 @@ using System.Threading.Tasks;
 
 namespace Developist.Core.Cqrs
 {
-    public abstract class DynamicDispatcherBase : IDynamicCommandDispatcher, IDynamicEventDispatcher
+    public abstract class DynamicDispatcher : IDynamicCommandDispatcher, IDynamicEventDispatcher
     {
-        protected DynamicDispatcherBase(IHandlerRegistry registry, ILogger? logger = null)
+        protected DynamicDispatcher(IHandlerRegistry registry, ILogger? logger = null)
         {
             HandlerRegistry = ArgumentNullExceptionHelper.ThrowIfNull(() => registry);
             Logger = logger ?? NullLoggerFactory.Instance.CreateLogger(GetType());
