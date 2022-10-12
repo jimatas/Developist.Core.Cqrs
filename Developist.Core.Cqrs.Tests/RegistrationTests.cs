@@ -276,7 +276,7 @@ namespace Developist.Core.Cqrs.Tests
 
             // Assert
             var exception = Assert.ThrowsException<InvalidOperationException>(action);
-            Assert.AreEqual($"No handler found for query with type '{typeof(QueryWithoutHandler)}'.", exception.Message);
+            Assert.AreEqual($"No handler found for query with type '{typeof(QueryWithoutHandler)}' and result type '{typeof(SampleQueryResult)}'.", exception.Message);
         }
 
         [TestMethod]
@@ -301,7 +301,7 @@ namespace Developist.Core.Cqrs.Tests
 
             // Assert
             var exception = Assert.ThrowsException<InvalidOperationException>(action);
-            Assert.AreEqual($"More than one handler found for query with type '{typeof(QueryWithMultipleHandlers)}'.", exception.Message);
+            Assert.AreEqual($"More than one handler found for query with type '{typeof(QueryWithMultipleHandlers)}' and result type '{typeof(SampleQueryResult)}'.", exception.Message);
         }
     }
 }
