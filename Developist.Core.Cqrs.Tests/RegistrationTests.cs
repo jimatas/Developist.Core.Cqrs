@@ -90,6 +90,21 @@ namespace Developist.Core.Cqrs.Tests
         }
 
         [TestMethod]
+        public void AddCqrs_GivenNull_ThrowsArgumentNullException()
+        {
+            // Arrange
+            // Act
+            void action() => ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(null!);
+            });
+
+            // Assert
+            var exception = Assert.ThrowsException<ArgumentNullException>(action);
+            Assert.AreEqual("setupAction", exception.ParamName);
+        }
+
+        [TestMethod]
         public void AddDynamicDispatcher_RegistersAllDynamicDispatcherInterfaces()
         {
             // Arrange
