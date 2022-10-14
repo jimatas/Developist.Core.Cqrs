@@ -23,35 +23,35 @@ namespace Developist.Core.Cqrs.Infrastructure
         public object GetCommandHandler(Type commandType)
         {
             var handlerType = typeof(ICommandHandler<>).MakeGenericType(commandType);
-            var handlers = serviceProvider.GetServices(handlerType).Cast<object>();
-            return handlers.Count() == 1 ? handlers.Single()
+            var handlers = serviceProvider.GetServices(handlerType);
+            return handlers.Count() == 1 ? handlers.Single()!
                 : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{commandType}'.");
         }
 
         public IEnumerable<object> GetCommandInterceptors(Type commandType)
         {
             var interceptorType = typeof(ICommandInterceptor<>).MakeGenericType(commandType);
-            return serviceProvider.GetServices(interceptorType).Cast<object>();
+            return serviceProvider.GetServices(interceptorType)!;
         }
 
         public IEnumerable<object> GetEventHandlers(Type eventType)
         {
             var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
-            return serviceProvider.GetServices(handlerType).Cast<object>();
+            return serviceProvider.GetServices(handlerType)!;
         }
 
         public object GetQueryHandler(Type queryType, Type resultType)
         {
             var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, resultType);
-            var handlers = serviceProvider.GetServices(handlerType).Cast<object>();
-            return handlers.Count() == 1 ? handlers.Single()
+            var handlers = serviceProvider.GetServices(handlerType);
+            return handlers.Count() == 1 ? handlers.Single()!
                 : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{queryType}' and result type '{resultType}'.");
         }
 
         public IEnumerable<object> GetQueryInterceptors(Type queryType, Type resultType)
         {
             var interceptorType = typeof(IQueryInterceptor<,>).MakeGenericType(queryType, resultType);
-            return serviceProvider.GetServices(interceptorType).Cast<object>();
+            return serviceProvider.GetServices(interceptorType)!;
         }
     }
 }
