@@ -14,8 +14,6 @@ The difference between a command and a query is that the latter returns a result
 #### Dispatching
 Routing messages to handlers is accomplished by the aforementioned dispatcher, which is a type that implements the [`IDispatcher`](Developist.Core.Cqrs/IDispatcher.cs) interface. Note that this top-level interface simply combines the individual [`ICommandDispatcher`](Developist.Core.Cqrs/Commands/ICommandDispatcher.cs), [`IQueryDispatcher`](Developist.Core.Cqrs/Queries/IQueryDispatcher.cs) and [`IEventDispatcher`](Developist.Core.Cqrs/Events/IEventDispatcher.cs) interfaces into a single convenient interface. Likewise, the [`IDynamicDispatcher`](Developist.Core.Cqrs/IDynamicDispatcher.cs) does the same for the [`IDynamicCommandDispatcher`](Developist.Core.Cqrs/Commands/IDynamicCommandDispatcher.cs), [`IDynamicQueryDispatcher`](Developist.Core.Cqrs/Queries/IDynamicQueryDispatcher.cs) and [`IDynamicEventDispatcher`](Developist.Core.Cqrs/Events/IDynamicEventDispatcher.cs) interfaces.
 
-Default implementations for both dispatcher interfaces are provided by the library. Internally, these implementations use the built-in dependency injection framework to resolve handlers at runtime. Using the DI registration extensions, specifically the `CqrsBuilderExtensions.AddHandlersFromAssembly` method, there will also be no need to manually register any of your handlers as they will be picked up and mapped to your messages automatically based on the available generic type information.
-
 The difference between regular (static) and dynamic dispatch is that the latter supports polymorphic dispatch of messages through the use of some reflection. 
 The best way to show what this means is by an example.
 
@@ -24,6 +22,8 @@ ICommand command = new SendEmailCommand(to, from, subject, body); // Note, the S
 await dispatcher.DispatchAsync(command); // Fails with "No handler found for command with type 'Developist.Core.Cqrs.Commands.ICommand'."
 await dynamicDispatcher.DispatchAsync(command) // Routes the ICommand parameter successfully to a handler that processes SendEmailCommand messages.
 ```
+
+Default implementations for both dispatcher interfaces are provided by the library. Internally, these implementations use the built-in dependency injection framework to resolve handlers at runtime. Using the DI registration extensions, specifically the `CqrsBuilderExtensions.AddHandlersFromAssembly` method, there will also be no need to manually register any of your handlers as they will be picked up and mapped to your messages automatically based on the available generic type information.
 
 #### Intercepting
 Another concept included in this library is that of interceptors. An interceptor is very much like a wrapper or decorator, and is mainly used to dynamically add addtional behavior around message processing. Multiple interceptors can be defined for a message type, or indeed entire sets of message types by utilizing open generic type parameters. These interceptors will be arranged back-to-back by the dispatcher, and as such will comprise a processing pipeline together with the handler.
