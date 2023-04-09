@@ -1,21 +1,31 @@
 # Developist.Core.Cqrs
 
-### Lightweight (no-dependency) and low-ceremony CQRS library
+### Lightweight (no dependency) and low-ceremony CQRS library
 
-Define your command messages by inheriting from the [`ICommand`](Developist.Core.Cqrs/Commands/ICommand.cs) interface and your query messages by inheriting from the [`IQuery<TResult>`](Developist.Core.Cqrs/Queries/IQuery`1.cs) generic interface. For notification style messages you can inherit from the [`IEvent`](Developist.Core.Cqrs/Events/IEvent.cs) interface. Note that these are all marker interfaces, they do not declare any members that have to be implemented.
+To define a command message, simply inherit from the [`ICommand`](src/Developist.Core.Cqrs/Commands/ICommand.cs) interface. 
+Similarly, to define a query message, inherit from the [`IQuery<TResult>`](src/Developist.Core.Cqrs/Queries/IQuery`1.cs) generic interface. 
+For notification-style messages, inherit from the [`IEvent`](src/Developist.Core.Cqrs/Events/IEvent.cs) interface. 
+Note that these are marker interfaces and do not declare any members that have to be implemented.
 
 #### Handling
-Instances of these message types are processed by handlers that you define by inheriting from respectively the [`ICommandHandler<T>`](Developist.Core.Cqrs/Commands/ICommandHandler`1.cs), [`IQueryHandler<T, TResult>`](Developist.Core.Cqrs/Queries/IQueryHandler`2.cs) and [`IEventHandler<T>`](Developist.Core.Cqrs/Events/IEventHandler`1.cs) generic interfaces. These interfaces all declare a single `HandleAsync` method that will have to be implemented.
+To process instances of these message types, you need to define handlers by inheriting from the appropriate interfaces. 
+Specifically, you should derive from the [`ICommandHandler<T>`](src/Developist.Core.Cqrs/Commands/ICommandHandler`1.cs), [`IQueryHandler<T, TResult>`](src/Developist.Core.Cqrs/Queries/IQueryHandler`2.cs), or [`IEventHandler<T>`](src/Developist.Core.Cqrs/Events/IEventHandler`1.cs) generic interfaces. 
+All of these interfaces declare a single `HandleAsync` method that needs to be implemented.
 
-For example, the `SendEmailCommand` message, which is a command, is processed by a handler that derives from `ICommandHandler<SendEmailCommmand>` and implements the `HandleAsync(SendEmailCommand command, CancellationToken cancellationToken)` method.
+For example, to handle the `SendEmailCommand` message, you need to create a handler that derives from `ICommandHandler<SendEmailCommmand>` and implements the `HandleAsync(SendEmailCommand command, CancellationToken cancellationToken)` method.
 
-The difference between a command and a query is that the latter returns a result while the former does not. Both of these message types can also only be processed by a single handler. Defining more than one, or no handler at all for a particular command or query will cause an exception to be thrown by the dispatcher. A notification on the other hand can be processed by zero, one, or more than one handler.
+The main difference between a command and a query is that the latter returns a result while the former does not. 
+Additionally, each command and query can only be processed by a single handler. 
+If you define more than one or no handler at all for a particular command or query, the dispatcher will throw an exception. 
+In contrast, a notification can be processed by zero, one, or more than one handler.
 
 #### Dispatching
-Routing messages to handlers is accomplished by the aforementioned dispatcher, which is a type that implements the [`IDispatcher`](Developist.Core.Cqrs/IDispatcher.cs) interface. Note that this top-level interface simply combines the individual [`ICommandDispatcher`](Developist.Core.Cqrs/Commands/ICommandDispatcher.cs), [`IQueryDispatcher`](Developist.Core.Cqrs/Queries/IQueryDispatcher.cs) and [`IEventDispatcher`](Developist.Core.Cqrs/Events/IEventDispatcher.cs) interfaces into a single convenient interface. Likewise, the [`IDynamicDispatcher`](Developist.Core.Cqrs/IDynamicDispatcher.cs) does the same for the [`IDynamicCommandDispatcher`](Developist.Core.Cqrs/Commands/IDynamicCommandDispatcher.cs), [`IDynamicQueryDispatcher`](Developist.Core.Cqrs/Queries/IDynamicQueryDispatcher.cs) and [`IDynamicEventDispatcher`](Developist.Core.Cqrs/Events/IDynamicEventDispatcher.cs) interfaces.
+The routing of messages to handlers is done by the dispatcher, which is a type that implements the [`IDispatcher`](Developist.Core.Cqrs/IDispatcher.cs) interface. 
+Note that this top-level interface simply combines the individual [`ICommandDispatcher`](src/Developist.Core.Cqrs/Commands/ICommandDispatcher.cs), [`IQueryDispatcher`](src/Developist.Core.Cqrs/Queries/IQueryDispatcher.cs) and [`IEventDispatcher`](src/Developist.Core.Cqrs/Events/IEventDispatcher.cs) interfaces into a single convenient interface. 
+Similarly, the [`IDynamicDispatcher`](src/Developist.Core.Cqrs/IDynamicDispatcher.cs) interface combines the [`IDynamicCommandDispatcher`](src/Developist.Core.Cqrs/Commands/IDynamicCommandDispatcher.cs), [`IDynamicQueryDispatcher`](src/Developist.Core.Cqrs/Queries/IDynamicQueryDispatcher.cs) and [`IDynamicEventDispatcher`](src/Developist.Core.Cqrs/Events/IDynamicEventDispatcher.cs) interfaces.
 
-The difference between regular (static) and dynamic dispatch is that the latter supports polymorphic dispatch of messages through the use of some reflection. 
-The best way to show what this means is by an example.
+The main difference between static and dynamic dispatch is that the latter supports polymorphic dispatch of messages through the use of reflection. 
+Here's an example to illustrate this difference:
 
 ```csharp
 ICommand command = new SendEmailCommand(to, from, subject, body); // Note, the SendEmailCommand is assigned to a variable of type ICommand.
@@ -23,11 +33,25 @@ await dispatcher.DispatchAsync(command); // Fails with "No handler found for com
 await dynamicDispatcher.DispatchAsync(command) // Routes the ICommand parameter successfully to a handler that processes SendEmailCommand messages.
 ```
 
-Default implementations for both dispatcher interfaces are provided by the library. Internally, these implementations use the built-in dependency injection framework to resolve handlers at runtime. Using the DI registration extensions, specifically the `CqrsBuilderExtensions.AddHandlersFromAssembly` method, there will also be no need to manually register any of your handlers as they will be picked up and mapped to your messages automatically based on the available generic type information.
+The library provides default implementations for both dispatcher interfaces. 
+These implementations use the built-in dependency injection framework to resolve handlers at runtime. 
+Moreover, the library provides registration extensions for DI, specifically the `CqrsBuilderExtensions.AddHandlersFromAssembly` method, which automatically scans for handlers and maps them to their corresponding messages based on generic type information. 
+This eliminates the need for manual registration of handlers.
 
 #### Intercepting
-Another concept included in this library is that of interceptors. An interceptor is very much like a wrapper or decorator, and is mainly used to dynamically add addtional behavior around message processing. Multiple interceptors can be defined for a message type, or indeed entire sets of message types by utilizing open generic type parameters. These interceptors will be arranged back-to-back by the dispatcher, and as such will comprise a processing pipeline together with the handler.
+Another concept included in this library is that of interceptors. 
+Interceptors can be thought of as filters that allow you to add additional behavior around message processing. 
+The main purpose of an interceptor is to modify or enhance the behavior of a command or query handler. 
+Interceptors are often used to add cross-cutting concerns such as logging, authentication, validation, or authorization.
 
-Both command and query dispatch support message interception. For this purpose the [`ICommandInterceptor<T>`](Developist.Core.Cqrs/Commands/ICommandInterceptor`1.cs) and [`IQueryInterceptor<T, TResult>`](Developist.Core.Cqrs/Queries/IQueryInterceptor`2.cs) interfaces are provided by the library. Depending on which message type you wish to intercept, you derive from the appropriate interface and implement the single `InterceptAsync` method. This method gets passed in the message as well as a function delegate that represents the call to the next interceptor, or ultimately the handler. So by not invoking this delegate you effectively shortcircuit the pipeline, stopping further processing.
+When a message is dispatched, the dispatcher first applies all the interceptors that have been registered for that message type. 
+The interceptors are arranged in a pipeline, with each interceptor being responsible for performing a specific behavior. 
+The pipeline starts with the first interceptor and proceeds to the last one in order.
 
-Just like handlers, interceptors will also be discovered automatically and wired-up with the appropriate message types by the dispatcher. If your interceptors need to run in some predetermined order, you can override the `Priority` property, which defaults to `PriorityLevel.Normal`. The dispatcher will order interceptors by taking into account their declared priority, with a higher priority meaning the interceptor runs earlier in the pipeline.
+Each interceptor in the pipeline has the ability to modify the message, modify the result (in the case of a query), or even cancel the processing of the message entirely. 
+If an interceptor cancels the processing of the message, subsequent interceptors and the handler are not executed.
+
+To ensure that interceptors run in a predetermined order, they can optionally implement the [`IPrioritizable`](src/Developist.Core.Cqrs/IPrioritizable.cs) interface and return the appropriate [`PriorityLevel`](src/Developist.Core.Cqrs/PriorityLevel.cs) from the `Priority` property.
+
+The handler is the last component in the pipeline and is responsible for the actual processing of the message. 
+Once all the interceptors in the pipeline have been applied, the dispatcher invokes the handler's `HandleAsync` method, passing in the modified message (if any).
