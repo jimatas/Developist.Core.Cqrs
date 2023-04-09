@@ -40,7 +40,7 @@
         BelowNormal = -32,
 
         /// <summary>
-        /// Interceptors with this priority level should run later in the pipeline, after above-normal and normal priority interceptors.
+        /// Interceptors with this priority level should run later in the pipeline, after normal and below-normal priority interceptors.
         /// </summary>
         Low = -64,
 
@@ -50,7 +50,7 @@
         VeryLow = -96,
 
         /// <summary>
-        /// The lowest priority level. Interceptors with this priority level should run last in the pipeline.
+        /// Interceptors with this priority level should run last in the pipeline.
         /// </summary>
         Lowest = -128
     }
