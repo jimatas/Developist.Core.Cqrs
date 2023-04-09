@@ -20,7 +20,7 @@ If you define more than one or no handler at all for a particular command or que
 In contrast, a notification can be processed by zero, one, or more than one handler.
 
 #### Dispatching
-The routing of messages to handlers is done by the dispatcher, which is a type that implements the [`IDispatcher`](Developist.Core.Cqrs/IDispatcher.cs) interface. 
+The routing of messages to handlers is done by the dispatcher, which is a type that implements the [`IDispatcher`](src/Developist.Core.Cqrs/IDispatcher.cs) interface. 
 Note that this top-level interface simply combines the individual [`ICommandDispatcher`](src/Developist.Core.Cqrs/Commands/ICommandDispatcher.cs), [`IQueryDispatcher`](src/Developist.Core.Cqrs/Queries/IQueryDispatcher.cs) and [`IEventDispatcher`](src/Developist.Core.Cqrs/Events/IEventDispatcher.cs) interfaces into a single convenient interface. 
 Similarly, the [`IDynamicDispatcher`](src/Developist.Core.Cqrs/IDynamicDispatcher.cs) interface combines the [`IDynamicCommandDispatcher`](src/Developist.Core.Cqrs/Commands/IDynamicCommandDispatcher.cs), [`IDynamicQueryDispatcher`](src/Developist.Core.Cqrs/Queries/IDynamicQueryDispatcher.cs) and [`IDynamicEventDispatcher`](src/Developist.Core.Cqrs/Events/IDynamicEventDispatcher.cs) interfaces.
 
