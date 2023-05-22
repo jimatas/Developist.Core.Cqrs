@@ -13,7 +13,7 @@ namespace Developist.Core.Cqrs.Commands
         /// </summary>
         /// <typeparam name="TCommand">The type of the command to be dispatched, which must implement the <see cref="ICommand"/> interface.</typeparam>
         /// <param name="command">The command to be dispatched.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">The cancellation token to observe.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task DispatchAsync<TCommand>(TCommand command, CancellationToken cancellationToken = default)
             where TCommand : ICommand;

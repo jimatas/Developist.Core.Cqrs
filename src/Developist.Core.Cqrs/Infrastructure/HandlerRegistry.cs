@@ -17,7 +17,7 @@ namespace Developist.Core.Cqrs.Infrastructure
         private readonly IServiceProvider _serviceProvider;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="HandlerRegistry"/> class.
+        /// Initializes a new instance of the <see cref="HandlerRegistry"/> class with the specified service provider.
         /// </summary>
         /// <param name="serviceProvider">The <see cref="IServiceProvider"/> instance to use for retrieving handlers and interceptors.</param>
         public HandlerRegistry(IServiceProvider serviceProvider)
@@ -26,42 +26,55 @@ namespace Developist.Core.Cqrs.Infrastructure
         }
 
         /// <inheritdoc/>
-        public object GetCommandHandler(Type commandType)
+        public ICommandHandler<TCommand> GetCommandHandler<TCommand>()
+            where TCommand : ICommand
         {
-            var handlerType = typeof(ICommandHandler<>).MakeGenericType(commandType);
+            var handlerType = typeof(ICommandHandler<>).MakeGenericType(typeof(TCommand));
             var handlers = _serviceProvider.GetServices(handlerType);
-            return handlers.Count() == 1 ? handlers.Single()
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{commandType}'.");
+
+            return handlers.Count() == 1
+                ? (ICommandHandler<TCommand>)handlers.Single()
+                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{typeof(TCommand)}'.");
         }
 
         /// <inheritdoc/>
-        public IEnumerable<object> GetCommandInterceptors(Type commandType)
+        public IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>() where TCommand : ICommand
         {
-            var interceptorType = typeof(ICommandInterceptor<>).MakeGenericType(commandType);
-            return _serviceProvider.GetServices(interceptorType).OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
+            var interceptorType = typeof(ICommandInterceptor<>).MakeGenericType(typeof(TCommand));
+            var interceptors = _serviceProvider.GetServices(interceptorType).Cast<ICommandInterceptor<TCommand>>();
+
+            return interceptors.OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
         }
 
         /// <inheritdoc/>
-        public IEnumerable<object> GetEventHandlers(Type eventType)
+        public IEnumerable<IEventHandler<TEvent>> GetEventHandlers<TEvent>()
+            where TEvent : IEvent
         {
-            var handlerType = typeof(IEventHandler<>).MakeGenericType(eventType);
-            return _serviceProvider.GetServices(handlerType);
+            var handlerType = typeof(IEventHandler<>).MakeGenericType(typeof(TEvent));
+
+            return _serviceProvider.GetServices(handlerType).Cast<IEventHandler<TEvent>>();
         }
 
         /// <inheritdoc/>
-        public object GetQueryHandler(Type queryType, Type resultType)
+        public IQueryHandler<TQuery, TResult> GetQueryHandler<TQuery, TResult>()
+            where TQuery : IQuery<TResult>
         {
-            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(queryType, resultType);
+            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(typeof(TQuery), typeof(TResult));
             var handlers = _serviceProvider.GetServices(handlerType);
-            return handlers.Count() == 1 ? handlers.Single()
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{queryType}' and result type '{resultType}'.");
+
+            return handlers.Count() == 1
+                ? (IQueryHandler<TQuery, TResult>)handlers.Single()
+                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{typeof(TQuery)}' and result type '{typeof(TResult)}'.");
         }
 
         /// <inheritdoc/>
-        public IEnumerable<object> GetQueryInterceptors(Type queryType, Type resultType)
+        public IOrderedEnumerable<IQueryInterceptor<TQuery, TResult>> GetQueryInterceptors<TQuery, TResult>()
+            where TQuery : IQuery<TResult>
         {
-            var interceptorType = typeof(IQueryInterceptor<,>).MakeGenericType(queryType, resultType);
-            return _serviceProvider.GetServices(interceptorType).OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
+            var interceptorType = typeof(IQueryInterceptor<,>).MakeGenericType(typeof(TQuery), typeof(TResult));
+            var interceptors = _serviceProvider.GetServices(interceptorType).Cast<IQueryInterceptor<TQuery, TResult>>();
+
+            return interceptors.OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
         }
     }
 }

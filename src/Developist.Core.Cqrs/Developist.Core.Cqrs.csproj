@@ -1,25 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Authors>Jim Atas</Authors>
-    <Description>Lightweight CQRS library built around an in-process mediator that can dispatch command, query, and event messages for processing by custom-defined handlers.</Description>
-    <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
-    <Version>7.0.0</Version>
-    <AssemblyVersion>$(Version.Split('.')[0]).$(Version.Split('.')[1]).0.0</AssemblyVersion>
-    <FileVersion>$(Version.Split('.')[0]).$(Version.Split('.')[1]).$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays))).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</FileVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageTags>cqrs;dispatcher;command;query;event</PackageTags>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/jimatas/Developist.Core.Cqrs</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/jimatas/Developist.Core.Cqrs</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
   </ItemGroup>
-  
+
 </Project>

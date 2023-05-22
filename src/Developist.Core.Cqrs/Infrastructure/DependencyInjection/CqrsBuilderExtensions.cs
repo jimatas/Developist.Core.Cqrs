@@ -12,20 +12,20 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
     /// <summary>
     /// Provides extension methods for configuring CQRS services using the <see cref="CqrsBuilder"/> class.
     /// </summary>
-    public static partial class CqrsBuilderExtensions
+    public static class CqrsBuilderExtensions
     {
         /// <summary>
-        /// Adds the <see cref="Dispatcher"/> class and related dispatcher interfaces and registry services to the service collection.
+        /// Adds the dispatcher classes and related interfaces and registry services to the service collection.
         /// </summary>
         /// <param name="builder">The <see cref="CqrsBuilder"/> instance to add the services to.</param>
         /// <param name="lifetime">The service lifetime.</param>
         /// <returns>The <see cref="CqrsBuilder"/> instance with added services.</returns>
-        public static CqrsBuilder AddDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
+        public static CqrsBuilder AddDispatchers(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
         {
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IDispatcher), typeof(Dispatcher), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(ICommandDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IEventDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IQueryDispatcher), provider => provider.GetRequiredService<IDispatcher>(), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(ICommandDispatcher), typeof(CommandDispatcher), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IEventDispatcher), typeof(EventDispatcher), lifetime));
+            builder.Services.TryAdd(new ServiceDescriptor(typeof(IQueryDispatcher), typeof(QueryDispatcher), lifetime));
 
             builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), typeof(HandlerRegistry), lifetime));
 
@@ -33,28 +33,10 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         }
 
         /// <summary>
-        /// Adds the <see cref="DynamicDispatcher"/> class and related dispatcher interfaces and registry services to the service collection.
+        /// Adds command, event, and query handlers, along with interceptors, from the specified assembly to the service collection.
         /// </summary>
         /// <param name="builder">The <see cref="CqrsBuilder"/> instance to add the services to.</param>
-        /// <param name="lifetime">The service lifetime.</param>
-        /// <returns>The <see cref="CqrsBuilder"/> instance with added services.</returns>
-        public static CqrsBuilder AddDynamicDispatcher(this CqrsBuilder builder, ServiceLifetime lifetime = ServiceLifetime.Scoped)
-        {
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicDispatcher), typeof(DynamicDispatcher), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicCommandDispatcher), provider => provider.GetRequiredService<IDynamicDispatcher>(), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicEventDispatcher), provider => provider.GetRequiredService<IDynamicDispatcher>(), lifetime));
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IDynamicQueryDispatcher), provider => provider.GetRequiredService<IDynamicDispatcher>(), lifetime));
-
-            builder.Services.TryAdd(new ServiceDescriptor(typeof(IHandlerRegistry), typeof(HandlerRegistry), lifetime));
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Scans an assembly for types that implement CQRS handlers (and interceptors), and adds them to the service collection.
-        /// </summary>
-        /// <param name="builder">The <see cref="CqrsBuilder"/> instance to add the services to.</param>
-        /// <param name="assembly">The assembly to scan for CQRS handler types.</param>
+        /// <param name="assembly">The assembly to scan for handler types.</param>
         /// <param name="lifetime">The service lifetime.</param>
         /// <returns>The <see cref="CqrsBuilder"/> instance with added services.</returns>
         public static CqrsBuilder AddHandlersFromAssembly(this CqrsBuilder builder, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Scoped)

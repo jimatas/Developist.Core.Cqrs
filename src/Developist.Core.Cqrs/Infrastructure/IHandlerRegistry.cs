@@ -1,5 +1,8 @@
-﻿using System;
+﻿using Developist.Core.Cqrs.Commands;
+using Developist.Core.Cqrs.Events;
+using Developist.Core.Cqrs.Queries;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Developist.Core.Cqrs.Infrastructure
 {
@@ -11,40 +14,43 @@ namespace Developist.Core.Cqrs.Infrastructure
         /// <summary>
         /// Gets the command handler for the specified command type.
         /// </summary>
-        /// <param name="commandType">The type of the command.</param>
-        /// <returns>The command handler.</returns>
-        /// <exception cref="InvalidOperationException">When no handler is registered for the specified command type, or when multiple handlers are registered.</exception>
-        object GetCommandHandler(Type commandType);
+        /// <typeparam name="TCommand">The type of the command.</typeparam>
+        /// <returns>The command handler for the specified command type.</returns>
+        ICommandHandler<TCommand> GetCommandHandler<TCommand>()
+            where TCommand : ICommand;
 
         /// <summary>
-        /// Gets the command interceptors for the specified command type.
+        /// Gets the command interceptors for the specified command type in the order of execution.
         /// </summary>
-        /// <param name="commandType">The type of the command.</param>
-        /// <returns>An enumerable collection of command interceptors, in the order they should be executed.</returns>
-        IEnumerable<object> GetCommandInterceptors(Type commandType);
+        /// <typeparam name="TCommand">The type of the command.</typeparam>
+        /// <returns>The command interceptors for the specified command type in the order of execution.</returns>
+        IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>()
+            where TCommand : ICommand;
 
         /// <summary>
         /// Gets the event handlers for the specified event type.
         /// </summary>
-        /// <param name="eventType">The type of the event.</param>
-        /// <returns>An enumerable collection of event handlers.</returns>
-        IEnumerable<object> GetEventHandlers(Type eventType);
+        /// <typeparam name="TEvent">The type of the event.</typeparam>
+        /// <returns>The event handlers for the specified event type.</returns>
+        IEnumerable<IEventHandler<TEvent>> GetEventHandlers<TEvent>()
+            where TEvent : IEvent;
 
         /// <summary>
-        /// Gets the query handler for the specified query and result types.
+        /// Gets the query handler for the specified query type and result type.
         /// </summary>
-        /// <param name="queryType">The type of the query.</param>
-        /// <param name="resultType">The type of the query result.</param>
-        /// <returns>The query handler.</returns>
-        /// <exception cref="InvalidOperationException">When no handler is registered for the specified query and result types, or when multiple handlers are registered.</exception>
-        object GetQueryHandler(Type queryType, Type resultType);
+        /// <typeparam name="TQuery">The type of the query.</typeparam>
+        /// <typeparam name="TResult">The type of the query result.</typeparam>
+        /// <returns>The query handler for the specified query type and result type.</returns>
+        IQueryHandler<TQuery, TResult> GetQueryHandler<TQuery, TResult>()
+            where TQuery : IQuery<TResult>;
 
         /// <summary>
-        /// Gets the query interceptors for the specified query and result types.
+        /// Gets the query interceptors for the specified query type and result type in the order of execution.
         /// </summary>
-        /// <param name="queryType">The type of the query.</param>
-        /// <param name="resultType">The type of the query result.</param>
-        /// <returns>An enumerable collection of query interceptors, in the order they should be executed.</returns>
-        IEnumerable<object> GetQueryInterceptors(Type queryType, Type resultType);
+        /// <typeparam name="TQuery">The type of the query.</typeparam>
+        /// <typeparam name="TResult">The type of the query result.</typeparam>
+        /// <returns>The query interceptors for the specified query type and result type in the order of execution.</returns>
+        IOrderedEnumerable<IQueryInterceptor<TQuery, TResult>> GetQueryInterceptors<TQuery, TResult>()
+            where TQuery : IQuery<TResult>;
     }
 }
