@@ -29,19 +29,17 @@ namespace Developist.Core.Cqrs.Infrastructure
         public ICommandHandler<TCommand> GetCommandHandler<TCommand>()
             where TCommand : ICommand
         {
-            var handlerType = typeof(ICommandHandler<>).MakeGenericType(typeof(TCommand));
-            var handlers = _serviceProvider.GetServices(handlerType);
+            var handlers = _serviceProvider.GetServices<ICommandHandler<TCommand>>();
 
-            return handlers.Count() == 1
-                ? (ICommandHandler<TCommand>)handlers.Single()
+            return handlers.Count() == 1 ? handlers.Single()
                 : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{typeof(TCommand)}'.");
         }
 
         /// <inheritdoc/>
-        public IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>() where TCommand : ICommand
+        public IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>() 
+            where TCommand : ICommand
         {
-            var interceptorType = typeof(ICommandInterceptor<>).MakeGenericType(typeof(TCommand));
-            var interceptors = _serviceProvider.GetServices(interceptorType).Cast<ICommandInterceptor<TCommand>>();
+            var interceptors = _serviceProvider.GetServices<ICommandInterceptor<TCommand>>().Cast<ICommandInterceptor<TCommand>>();
 
             return interceptors.OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
         }
@@ -50,20 +48,16 @@ namespace Developist.Core.Cqrs.Infrastructure
         public IEnumerable<IEventHandler<TEvent>> GetEventHandlers<TEvent>()
             where TEvent : IEvent
         {
-            var handlerType = typeof(IEventHandler<>).MakeGenericType(typeof(TEvent));
-
-            return _serviceProvider.GetServices(handlerType).Cast<IEventHandler<TEvent>>();
+            return _serviceProvider.GetServices<IEventHandler<TEvent>>().Cast<IEventHandler<TEvent>>();
         }
 
         /// <inheritdoc/>
         public IQueryHandler<TQuery, TResult> GetQueryHandler<TQuery, TResult>()
             where TQuery : IQuery<TResult>
         {
-            var handlerType = typeof(IQueryHandler<,>).MakeGenericType(typeof(TQuery), typeof(TResult));
-            var handlers = _serviceProvider.GetServices(handlerType);
+            var handlers = _serviceProvider.GetServices<IQueryHandler<TQuery, TResult>>();
 
-            return handlers.Count() == 1
-                ? (IQueryHandler<TQuery, TResult>)handlers.Single()
+            return handlers.Count() == 1 ? handlers.Single()
                 : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{typeof(TQuery)}' and result type '{typeof(TResult)}'.");
         }
 
@@ -71,8 +65,7 @@ namespace Developist.Core.Cqrs.Infrastructure
         public IOrderedEnumerable<IQueryInterceptor<TQuery, TResult>> GetQueryInterceptors<TQuery, TResult>()
             where TQuery : IQuery<TResult>
         {
-            var interceptorType = typeof(IQueryInterceptor<,>).MakeGenericType(typeof(TQuery), typeof(TResult));
-            var interceptors = _serviceProvider.GetServices(interceptorType).Cast<IQueryInterceptor<TQuery, TResult>>();
+            var interceptors = _serviceProvider.GetServices<IQueryInterceptor<TQuery, TResult>>().Cast<IQueryInterceptor<TQuery, TResult>>();
 
             return interceptors.OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
         }
