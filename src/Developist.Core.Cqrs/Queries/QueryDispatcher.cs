@@ -15,7 +15,7 @@ namespace Developist.Core.Cqrs.Queries
     /// </summary>
     public sealed class QueryDispatcher : IQueryDispatcher
     {
-        private readonly ConcurrentDictionary<(Type QueryType, Type ResultType), Delegate> _dispatcherDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
+        private readonly ConcurrentDictionary<(Type, Type), Delegate> _dispatcherDelegates = new ConcurrentDictionary<(Type, Type), Delegate>();
         private readonly IHandlerRegistry _registry;
         private readonly ILogger _logger;
 
