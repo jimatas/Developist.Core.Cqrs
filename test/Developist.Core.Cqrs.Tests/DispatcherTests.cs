@@ -1,5 +1,6 @@
 ﻿using Developist.Core.Cqrs.Commands;
 using Developist.Core.Cqrs.Events;
+using Developist.Core.Cqrs.Infrastructure;
 using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
 using Developist.Core.Cqrs.Queries;
 using Developist.Core.Cqrs.Tests.Fixture;
@@ -63,6 +64,48 @@ public class DispatcherTests
         // Assert
         var exception = Assert.ThrowsException<ArgumentNullException>(action);
         Assert.AreEqual(nameof(queryDispatcher), exception.ParamName);
+    }
+
+    [TestMethod]
+    public void InitializeCommandDispatcher_GivenNullRegistry_ThrowsArgumentNullException()
+    {
+        // Arrange
+        IHandlerRegistry? registry = null;
+
+        // Act
+        var action = () => new CommandDispatcher(registry);
+
+        // Assert
+        var exception = Assert.ThrowsException<ArgumentNullException>(action);
+        Assert.AreEqual(nameof(registry), exception.ParamName);
+    }
+
+    [TestMethod]
+    public void InitializeEventDispatcher_GivenNullRegistry_ThrowsArgumentNullException()
+    {
+        // Arrange
+        IHandlerRegistry? registry = null;
+
+        // Act
+        var action = () => new EventDispatcher(registry);
+
+        // Assert
+        var exception = Assert.ThrowsException<ArgumentNullException>(action);
+        Assert.AreEqual(nameof(registry), exception.ParamName);
+    }
+
+    [TestMethod]
+    public void InitializeQueryDispatcher_GivenNullRegistry_ThrowsArgumentNullException()
+    {
+        // Arrange
+        IHandlerRegistry? registry = null;
+
+        // Act
+        var action = () => new QueryDispatcher(registry);
+
+        // Assert
+        var exception = Assert.ThrowsException<ArgumentNullException>(action);
+        Assert.AreEqual(nameof(registry), exception.ParamName);
     }
 
     [TestMethod]
