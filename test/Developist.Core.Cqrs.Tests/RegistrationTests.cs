@@ -8,6 +8,7 @@ using Developist.Core.Cqrs.Tests.Fixture.Events;
 using Developist.Core.Cqrs.Tests.Fixture.Queries;
 using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Developist.Core.Cqrs.Tests;
 
@@ -18,15 +19,17 @@ public class RegistrationTests
     public void AddCqrs_GivenNullAction_ThrowsArgumentNullException()
     {
         // Arrange
+        Action<CqrsBuilder>? configureBuilder = null;
+
         // Act
-        var action = () => ServiceProviderHelper.ConfigureServiceProvider(services =>
+        var action = () =>
         {
-            services.AddCqrs(configureBuilder: null);
-        });
+            using var _ = ServiceProviderHelper.ConfigureServiceProvider(services => services.AddCqrs(configureBuilder));
+        };
 
         // Assert
         var exception = Assert.ThrowsException<ArgumentNullException>(action);
-        Assert.AreEqual("configureBuilder", exception.ParamName);
+        Assert.AreEqual(nameof(configureBuilder), exception.ParamName);
     }
 
     [TestMethod]
@@ -77,6 +80,29 @@ public class RegistrationTests
         Assert.IsInstanceOfType(commandDispatcher, typeof(CommandDispatcher));
         Assert.IsInstanceOfType(eventDispatcher, typeof(EventDispatcher));
         Assert.IsInstanceOfType(queryDispatcher, typeof(QueryDispatcher));
+    }
+
+    [TestMethod]
+    public void AddHandlersFromAssembly_GivenNullAssembly_ThrowsArgumentNullException()
+    {
+        // Arrange
+        Assembly? assembly = null;
+
+        // Act
+        var action = () =>
+        {
+            using var _ = ServiceProviderHelper.ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddHandlersFromAssembly(assembly);
+                });
+            });
+        };
+
+        // Assert
+        var exception = Assert.ThrowsException<ArgumentNullException>(action);
+        Assert.AreEqual(nameof(assembly), exception.ParamName);
     }
 
     [TestMethod]
