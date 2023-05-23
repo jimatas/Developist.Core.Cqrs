@@ -22,18 +22,8 @@ In contrast, a notification can be processed by zero, one, or more than one hand
 #### Dispatching
 The routing of messages to handlers is done by the dispatcher, which is a type that implements the [`IDispatcher`](src/Developist.Core.Cqrs/IDispatcher.cs) interface. 
 Note that this top-level interface simply combines the individual [`ICommandDispatcher`](src/Developist.Core.Cqrs/Commands/ICommandDispatcher.cs), [`IQueryDispatcher`](src/Developist.Core.Cqrs/Queries/IQueryDispatcher.cs) and [`IEventDispatcher`](src/Developist.Core.Cqrs/Events/IEventDispatcher.cs) interfaces into a single convenient interface. 
-Similarly, the [`IDynamicDispatcher`](src/Developist.Core.Cqrs/IDynamicDispatcher.cs) interface combines the [`IDynamicCommandDispatcher`](src/Developist.Core.Cqrs/Commands/IDynamicCommandDispatcher.cs), [`IDynamicQueryDispatcher`](src/Developist.Core.Cqrs/Queries/IDynamicQueryDispatcher.cs) and [`IDynamicEventDispatcher`](src/Developist.Core.Cqrs/Events/IDynamicEventDispatcher.cs) interfaces.
 
-The main difference between static and dynamic dispatch is that the latter supports polymorphic dispatch of messages through the use of reflection. 
-Here's an example to illustrate this difference:
-
-```csharp
-ICommand command = new SendEmailCommand(to, from, subject, body); // Note, the SendEmailCommand is assigned to a variable of type ICommand.
-await dispatcher.DispatchAsync(command); // Fails with "No handler found for command with type 'Developist.Core.Cqrs.Commands.ICommand'."
-await dynamicDispatcher.DispatchAsync(command) // Routes the ICommand parameter successfully to a handler that processes SendEmailCommand messages.
-```
-
-The library provides default implementations for both dispatcher interfaces. 
+The library provides default implementations for all dispatcher interfaces. 
 These implementations use the built-in dependency injection framework to resolve handlers at runtime. 
 Moreover, the library provides registration extensions for DI, specifically the `CqrsBuilderExtensions.AddHandlersFromAssembly` method, which automatically scans for handlers and maps them to their corresponding messages based on generic type information. 
 This eliminates the need for manual registration of handlers.
@@ -41,8 +31,7 @@ This eliminates the need for manual registration of handlers.
 #### Intercepting
 Another concept included in this library is that of interceptors. 
 Interceptors can be thought of as filters that allow you to add additional behavior around message processing. 
-The main purpose of an interceptor is to modify or enhance the behavior of a command or query handler. 
-Interceptors are often used to add cross-cutting concerns such as logging, authentication, validation, or authorization.
+The main purpose of an interceptor is to modify or enhance the behavior of a command or query handler.
 
 When a message is dispatched, the dispatcher first applies all the interceptors that have been registered for that message type. 
 The interceptors are arranged in a pipeline, with each interceptor being responsible for performing a specific behavior. 
