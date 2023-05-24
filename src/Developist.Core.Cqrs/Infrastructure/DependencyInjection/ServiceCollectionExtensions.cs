@@ -23,6 +23,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
 
             var builder = new CqrsBuilder(services);
             configureBuilder(builder);
+
             return services;
         }
     }

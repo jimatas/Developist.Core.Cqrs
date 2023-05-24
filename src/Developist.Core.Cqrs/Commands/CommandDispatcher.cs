@@ -47,6 +47,7 @@ namespace Developist.Core.Cqrs.Commands
             catch (Exception exception)
             {
                 _logger.LogWarning(exception, "Unhandled exception during command dispatch: {ExceptionMessage}", exception.Message);
+
                 throw;
             }
 
@@ -57,6 +58,7 @@ namespace Developist.Core.Cqrs.Commands
                 {
                     pipeline = Pipe(pipeline, interceptor);
                 }
+
                 return pipeline(command, cancellationToken);
             }
 

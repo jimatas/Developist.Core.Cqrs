@@ -42,7 +42,9 @@ namespace Developist.Core.Cqrs.Queries
             var queryType = query.GetType();
             var resultType = typeof(TResult);
 
-            var dispatcherDelegate = (QueryDispatcherDelegate<TResult>)_dispatcherDelegates.GetOrAdd((queryType, resultType), _ => CreateDispatcherDelegate());
+            var dispatcherDelegate = (QueryDispatcherDelegate<TResult>)_dispatcherDelegates
+                .GetOrAdd((queryType, resultType), _ => CreateDispatcherDelegate());
+
             return dispatcherDelegate.Invoke(query, cancellationToken);
 
             Delegate CreateDispatcherDelegate()
@@ -81,6 +83,7 @@ namespace Developist.Core.Cqrs.Queries
             catch (Exception exception)
             {
                 _logger.LogWarning(exception, "Unhandled exception during query dispatch: {ExceptionMessage}", exception.Message);
+
                 throw;
             }
 
@@ -91,6 +94,7 @@ namespace Developist.Core.Cqrs.Queries
                 {
                     pipeline = Pipe(pipeline, interceptor);
                 }
+
                 return pipeline((TQuery)query, cancellationToken);
             }
 

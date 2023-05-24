@@ -84,6 +84,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
                     }
                 }
             }
+
             return builder;
         }
 
@@ -101,6 +102,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         {
             var service = new ServiceDescriptor(typeof(ICommandHandler<TCommand>), typeof(TCommandHandler), lifetime);
             builder.Services.TryAdd(service);
+
             return builder;
         }
 
@@ -118,6 +120,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         {
             var service = new ServiceDescriptor(typeof(ICommandInterceptor<TCommand>), typeof(TCommandInterceptor), lifetime);
             builder.Services.TryAddEnumerable(service);
+
             return builder;
         }
 
@@ -135,6 +138,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         {
             var service = new ServiceDescriptor(typeof(IEventHandler<TEvent>), typeof(TEventHandler), lifetime);
             builder.Services.TryAddEnumerable(service);
+
             return builder;
         }
 
@@ -153,6 +157,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         {
             var service = new ServiceDescriptor(typeof(IQueryHandler<TQuery, TResult>), typeof(TQueryHandler), lifetime);
             builder.Services.TryAdd(service);
+
             return builder;
         }
 
@@ -171,6 +176,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
         {
             var service = new ServiceDescriptor(typeof(IQueryInterceptor<TQuery, TResult>), typeof(TQueryInterceptor), lifetime);
             builder.Services.TryAddEnumerable(service);
+
             return builder;
         }
     }

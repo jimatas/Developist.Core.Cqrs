@@ -59,6 +59,7 @@ namespace Developist.Core.Cqrs.Events
                 catch (Exception exception)
                 {
                     _logger.LogWarning(exception, "Unhandled exception during event dispatch: {ExceptionMessage}", exception.Message);
+
                     return Task.FromException(exception);
                 }
             }

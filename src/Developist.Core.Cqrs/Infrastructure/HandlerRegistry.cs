@@ -30,8 +30,11 @@ namespace Developist.Core.Cqrs.Infrastructure
             where TCommand : ICommand
         {
             var handlers = _serviceProvider.GetServices<ICommandHandler<TCommand>>();
-            return handlers.Count() == 1 ? handlers.Single()
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{typeof(TCommand)}'.");
+
+            return handlers.Count() == 1
+                ? handlers.Single()
+                : throw new InvalidOperationException((handlers.Any() ? "More than one" : "No")
+                    + $" handler found for command with type '{typeof(TCommand)}'.");
         }
 
         /// <inheritdoc/>
@@ -54,8 +57,11 @@ namespace Developist.Core.Cqrs.Infrastructure
             where TQuery : IQuery<TResult>
         {
             var handlers = _serviceProvider.GetServices<IQueryHandler<TQuery, TResult>>();
-            return handlers.Count() == 1 ? handlers.Single()
-                : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{typeof(TQuery)}' and result type '{typeof(TResult)}'.");
+
+            return handlers.Count() == 1
+                ? handlers.Single()
+                : throw new InvalidOperationException((handlers.Any() ? "More than one" : "No")
+                    + $" handler found for query with type '{typeof(TQuery)}' and result type '{typeof(TResult)}'.");
         }
 
         /// <inheritdoc/>
