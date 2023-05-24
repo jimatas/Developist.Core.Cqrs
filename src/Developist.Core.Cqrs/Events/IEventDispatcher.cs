@@ -13,7 +13,7 @@ namespace Developist.Core.Cqrs.Events
         /// </summary>
         /// <typeparam name="TEvent">The type of the event to be dispatched, which must implement the <see cref="IEvent"/> interface.</typeparam>
         /// <param name="event">The event to be dispatched.</param>
-        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <param name="cancellationToken">The cancellation token to observe.</param>
         /// <returns>A task representing the asynchronous operation.</returns>
         Task DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
             where TEvent : IEvent;
