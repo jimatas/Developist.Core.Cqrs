@@ -30,25 +30,23 @@ namespace Developist.Core.Cqrs.Infrastructure
             where TCommand : ICommand
         {
             var handlers = _serviceProvider.GetServices<ICommandHandler<TCommand>>();
-
             return handlers.Count() == 1 ? handlers.Single()
                 : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for command with type '{typeof(TCommand)}'.");
         }
 
         /// <inheritdoc/>
-        public IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>() 
+        public IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>()
             where TCommand : ICommand
         {
-            var interceptors = _serviceProvider.GetServices<ICommandInterceptor<TCommand>>().Cast<ICommandInterceptor<TCommand>>();
-
-            return interceptors.OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
+            return _serviceProvider.GetServices<ICommandInterceptor<TCommand>>()
+                .OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
         }
 
         /// <inheritdoc/>
         public IEnumerable<IEventHandler<TEvent>> GetEventHandlers<TEvent>()
             where TEvent : IEvent
         {
-            return _serviceProvider.GetServices<IEventHandler<TEvent>>().Cast<IEventHandler<TEvent>>();
+            return _serviceProvider.GetServices<IEventHandler<TEvent>>();
         }
 
         /// <inheritdoc/>
@@ -56,7 +54,6 @@ namespace Developist.Core.Cqrs.Infrastructure
             where TQuery : IQuery<TResult>
         {
             var handlers = _serviceProvider.GetServices<IQueryHandler<TQuery, TResult>>();
-
             return handlers.Count() == 1 ? handlers.Single()
                 : throw new InvalidOperationException($"{(handlers.Any() ? "More than one" : "No")} handler found for query with type '{typeof(TQuery)}' and result type '{typeof(TResult)}'.");
         }
@@ -65,9 +62,8 @@ namespace Developist.Core.Cqrs.Infrastructure
         public IOrderedEnumerable<IQueryInterceptor<TQuery, TResult>> GetQueryInterceptors<TQuery, TResult>()
             where TQuery : IQuery<TResult>
         {
-            var interceptors = _serviceProvider.GetServices<IQueryInterceptor<TQuery, TResult>>().Cast<IQueryInterceptor<TQuery, TResult>>();
-
-            return interceptors.OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
+            return _serviceProvider.GetServices<IQueryInterceptor<TQuery, TResult>>()
+                .OrderBy(interceptor => (interceptor as IPrioritizable)?.Priority ?? PriorityLevel.Normal);
         }
     }
 }
