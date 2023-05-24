@@ -20,10 +20,10 @@ namespace Developist.Core.Cqrs.Infrastructure
             where TCommand : ICommand;
 
         /// <summary>
-        /// Gets the command interceptors for the specified command type in the order of execution.
+        /// Gets the command interceptors for the specified command type.
         /// </summary>
         /// <typeparam name="TCommand">The type of the command.</typeparam>
-        /// <returns>The command interceptors for the specified command type in the order of execution.</returns>
+        /// <returns>The command interceptors for the specified command type, in the order they should be executed.</returns>
         IOrderedEnumerable<ICommandInterceptor<TCommand>> GetCommandInterceptors<TCommand>()
             where TCommand : ICommand;
 
@@ -45,11 +45,11 @@ namespace Developist.Core.Cqrs.Infrastructure
             where TQuery : IQuery<TResult>;
 
         /// <summary>
-        /// Gets the query interceptors for the specified query type and result type in the order of execution.
+        /// Gets the query interceptors for the specified query type and result type.
         /// </summary>
         /// <typeparam name="TQuery">The type of the query.</typeparam>
         /// <typeparam name="TResult">The type of the query result.</typeparam>
-        /// <returns>The query interceptors for the specified query type and result type in the order of execution.</returns>
+        /// <returns>The query interceptors for the specified query type and result type, in the order they should be executed.</returns>
         IOrderedEnumerable<IQueryInterceptor<TQuery, TResult>> GetQueryInterceptors<TQuery, TResult>()
             where TQuery : IQuery<TResult>;
     }
