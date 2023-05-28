@@ -59,7 +59,7 @@ namespace Developist.Core.Cqrs.Commands
                     pipeline = Pipe(pipeline, interceptor);
                 }
 
-                return pipeline(command, cancellationToken);
+                return pipeline.Invoke(command, cancellationToken);
             }
 
             CommandHandlerDelegate<TCommand> Pipe(CommandHandlerDelegate<TCommand> next, ICommandInterceptor<TCommand> interceptor)

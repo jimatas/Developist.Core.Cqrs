@@ -95,7 +95,7 @@ namespace Developist.Core.Cqrs.Queries
                     pipeline = Pipe(pipeline, interceptor);
                 }
 
-                return pipeline((TQuery)query, cancellationToken);
+                return pipeline.Invoke((TQuery)query, cancellationToken);
             }
 
             QueryHandlerDelegate<TQuery, TResult> Pipe(QueryHandlerDelegate<TQuery, TResult> next, IQueryInterceptor<TQuery, TResult> interceptor)
