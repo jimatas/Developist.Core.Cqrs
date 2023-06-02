@@ -12,25 +12,6 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class CqrsBuilderExtensions
     {
         /// <summary>
-        /// Adds CQRS services to the specified <see cref="IServiceCollection"/> instance using the provided configuration delegate.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> instance to add services to.</param>
-        /// <param name="configureBuilder">A delegate that configures the <see cref="CqrsBuilder"/> instance.</param>
-        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
-        public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsBuilder> configureBuilder)
-        {
-            if (configureBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(configureBuilder));
-            }
-
-            var builder = new CqrsBuilder(services);
-            configureBuilder(builder);
-
-            return services;
-        }
-
-        /// <summary>
         /// Adds the dispatcher classes and related interfaces and registry services to the service collection.
         /// </summary>
         /// <param name="builder">The <see cref="CqrsBuilder"/> instance to add the services to.</param>
