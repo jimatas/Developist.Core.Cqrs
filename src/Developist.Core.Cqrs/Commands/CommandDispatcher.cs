@@ -1,11 +1,10 @@
-﻿using Developist.Core.Cqrs.Infrastructure;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Commands
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="ICommandDispatcher"/> interface.

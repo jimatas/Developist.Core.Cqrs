@@ -1,6 +1,4 @@
-﻿using Developist.Core.Cqrs.Events;
-using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
-using Developist.Core.Cqrs.Tests.Fixture.Events;
+﻿using Developist.Core.Cqrs.Tests.Fixture.Events;
 using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 

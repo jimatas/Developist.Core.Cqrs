@@ -1,6 +1,4 @@
-﻿using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
-using Developist.Core.Cqrs.Queries;
-using Developist.Core.Cqrs.Tests.Fixture.Queries;
+﻿using Developist.Core.Cqrs.Tests.Fixture.Queries;
 using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

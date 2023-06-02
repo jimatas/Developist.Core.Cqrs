@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Commands
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Represents a delegate that handles a command asynchronously.

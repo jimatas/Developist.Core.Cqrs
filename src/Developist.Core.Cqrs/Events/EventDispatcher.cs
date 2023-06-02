@@ -1,12 +1,11 @@
-﻿using Developist.Core.Cqrs.Infrastructure;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Events
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="IEventDispatcher"/> interface.

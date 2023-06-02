@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-
-namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
+﻿namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Represents a builder for configuring CQRS services.

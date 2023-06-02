@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Queries
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Defines the contract for an interceptor that intercepts queries of type <typeparamref name="TQuery"/> and returns a result of type <typeparamref name="TResult"/>.

@@ -1,6 +1,4 @@
-﻿using Developist.Core.Cqrs.Queries;
-
-namespace Developist.Core.Cqrs.Tests.Fixture.Queries;
+﻿namespace Developist.Core.Cqrs.Tests.Fixture.Queries;
 
 public class SampleQueryInterceptorWithBelowNormalPriority : IQueryInterceptor<SampleQuery, SampleQueryResult>, IPrioritizable
 {

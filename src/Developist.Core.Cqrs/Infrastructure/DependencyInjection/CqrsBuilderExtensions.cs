@@ -1,19 +1,35 @@
-﻿using Developist.Core.Cqrs.Commands;
-using Developist.Core.Cqrs.Events;
-using Developist.Core.Cqrs.Queries;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Developist.Core.Cqrs;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods for configuring CQRS services using the <see cref="CqrsBuilder"/> class.
     /// </summary>
     public static class CqrsBuilderExtensions
     {
+        /// <summary>
+        /// Adds CQRS services to the specified <see cref="IServiceCollection"/> instance using the provided configuration delegate.
+        /// </summary>
+        /// <param name="services">The <see cref="IServiceCollection"/> instance to add services to.</param>
+        /// <param name="configureBuilder">A delegate that configures the <see cref="CqrsBuilder"/> instance.</param>
+        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
+        public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsBuilder> configureBuilder)
+        {
+            if (configureBuilder is null)
+            {
+                throw new ArgumentNullException(nameof(configureBuilder));
+            }
+
+            var builder = new CqrsBuilder(services);
+            configureBuilder(builder);
+
+            return services;
+        }
+
         /// <summary>
         /// Adds the dispatcher classes and related interfaces and registry services to the service collection.
         /// </summary>

@@ -1,7 +1,4 @@
-﻿using Developist.Core.Cqrs.Commands;
-using Developist.Core.Cqrs.Events;
-using Developist.Core.Cqrs.Queries;
-using System;
+﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
 

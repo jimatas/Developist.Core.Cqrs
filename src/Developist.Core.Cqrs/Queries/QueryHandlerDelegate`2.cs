@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Queries
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Represents a delegate that handles a query asynchronously and returns the result.
