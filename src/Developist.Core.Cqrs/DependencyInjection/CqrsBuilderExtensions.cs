@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
     public static class CqrsBuilderExtensions
     {
         /// <summary>
-        /// Adds the dispatcher classes and related interfaces and registry services to the service collection.
+        /// Adds the default implementations of the various dispatcher interfaces and the related handler registry interface to the service collection.
         /// </summary>
         /// <param name="builder">The <see cref="CqrsBuilder"/> instance to add the services to.</param>
         /// <param name="lifetime">The service lifetime.</param>
