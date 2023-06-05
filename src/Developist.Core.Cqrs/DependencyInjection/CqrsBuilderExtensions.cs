@@ -1,13 +1,10 @@
-﻿using Developist.Core.Cqrs.Commands;
-using Developist.Core.Cqrs.Events;
-using Developist.Core.Cqrs.Queries;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Developist.Core.Cqrs;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Linq;
 using System.Reflection;
 
-namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods for configuring CQRS services using the <see cref="CqrsBuilder"/> class.
@@ -15,7 +12,7 @@ namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
     public static class CqrsBuilderExtensions
     {
         /// <summary>
-        /// Adds the dispatcher classes and related interfaces and registry services to the service collection.
+        /// Adds the default implementations of the various dispatcher interfaces and the related handler registry interface to the service collection.
         /// </summary>
         /// <param name="builder">The <see cref="CqrsBuilder"/> instance to add the services to.</param>
         /// <param name="lifetime">The service lifetime.</param>

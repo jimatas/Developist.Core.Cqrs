@@ -1,9 +1,4 @@
-﻿using Developist.Core.Cqrs.Commands;
-using Developist.Core.Cqrs.Events;
-using Developist.Core.Cqrs.Infrastructure;
-using Developist.Core.Cqrs.Infrastructure.DependencyInjection;
-using Developist.Core.Cqrs.Queries;
-using Developist.Core.Cqrs.Tests.Fixture.Commands;
+﻿using Developist.Core.Cqrs.Tests.Fixture.Commands;
 using Developist.Core.Cqrs.Tests.Fixture.Events;
 using Developist.Core.Cqrs.Tests.Fixture.Queries;
 using Developist.Core.Cqrs.Tests.Helpers;
@@ -20,7 +15,7 @@ public class RegistrationTests
     {
         // Arrange
         Action<CqrsBuilder>? configureBuilder = null;
-
+        
         // Act
         var action = () =>
         {

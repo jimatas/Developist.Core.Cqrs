@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 
-namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     /// <summary>
-    /// Provides extension methods for configuring CQRS services using the <see cref="CqrsBuilder"/> class.
+    /// Provides extension methods for the <see cref="IServiceCollection"/> interface to add CQRS services.
     /// </summary>
     public static class ServiceCollectionExtensions
     {

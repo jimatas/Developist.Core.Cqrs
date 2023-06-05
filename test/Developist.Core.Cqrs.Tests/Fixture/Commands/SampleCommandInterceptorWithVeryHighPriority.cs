@@ -1,6 +1,4 @@
-﻿using Developist.Core.Cqrs.Commands;
-
-namespace Developist.Core.Cqrs.Tests.Fixture.Commands;
+﻿namespace Developist.Core.Cqrs.Tests.Fixture.Commands;
 
 public class SampleCommandInterceptorWithVeryHighPriority : ICommandInterceptor<SampleCommand>, IPrioritizable
 {

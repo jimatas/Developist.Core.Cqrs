@@ -1,12 +1,9 @@
-﻿using Developist.Core.Cqrs.Commands;
-using Developist.Core.Cqrs.Events;
-using Developist.Core.Cqrs.Queries;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Developist.Core.Cqrs.Infrastructure
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Represents the default implementation of the <see cref="IHandlerRegistry"/> interface, which retrieves handlers and interceptors using the built-in DI container.

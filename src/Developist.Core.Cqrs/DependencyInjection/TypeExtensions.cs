@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Developist.Core.Cqrs.Infrastructure.DependencyInjection
+﻿namespace System
 {
     /// <summary>
     /// Provides extension methods for <see cref="Type"/> objects.

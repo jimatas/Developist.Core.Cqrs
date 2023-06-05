@@ -1,7 +1,7 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace Developist.Core.Cqrs.Events
+namespace Developist.Core.Cqrs
 {
     /// <summary>
     /// Defines the contract for an event handler that handles events of type <typeparamref name="TEvent"/>.
