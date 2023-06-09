@@ -3,6 +3,7 @@ using Developist.Core.Cqrs.Tests.Fixture.Events;
 using Developist.Core.Cqrs.Tests.Fixture.Queries;
 using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using System.Reflection;
 
 namespace Developist.Core.Cqrs.Tests;
@@ -126,6 +127,30 @@ public class RegistrationTests
         Assert.IsTrue(sampleEventHandlers.Any());
         Assert.IsTrue(sampleCommandInterceptors.Any());
         Assert.IsTrue(sampleQueryInterceptors.Any());
+    }
+
+    [TestMethod]
+    public void AddHandlersFromAssembly_GivenAssemblyWithPartiallyClosedHandler_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var mockAssembly = new Mock<Assembly>();
+        mockAssembly.Setup(a => a.ExportedTypes).Returns(new[] { typeof(PartiallyClosedQueryHandler<>) });
+
+        // Act
+        var action = () =>
+        {
+            using var _ = ServiceProviderHelper.ConfigureServiceProvider(services =>
+            {
+                services.AddCqrs(builder =>
+                {
+                    builder.AddHandlersFromAssembly(mockAssembly.Object);
+                });
+            });
+        };
+
+        // Assert
+        var exception = Assert.ThrowsException<InvalidOperationException>(action);
+        Assert.AreEqual("Types that only partially close either the IQueryHandler or IQueryInterceptor generic interface are not supported.", exception.Message);
     }
 
     [TestMethod]
