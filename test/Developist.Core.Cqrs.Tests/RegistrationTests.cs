@@ -130,6 +130,48 @@ public class RegistrationTests
     }
 
     [TestMethod]
+    public void AddHandlersFromAssembly_ByDefault_RegistersGenericCommandInterceptor()
+    {
+        // Arrange
+        using var serviceProvider = ServiceProviderHelper.ConfigureServiceProvider(services =>
+        {
+            services.AddScoped(_ => new Queue<Type>());
+            services.AddCqrs(builder =>
+            {
+                builder.AddHandlersFromAssembly(GetType().Assembly);
+            });
+        });
+
+        // Act
+        var genericCommandInterceptor = serviceProvider.GetServices<ICommandInterceptor<SampleCommand>>()
+            .FirstOrDefault(interceptor => interceptor is GenericCommandInterceptor<SampleCommand>);
+
+        // Assert
+        Assert.IsNotNull(genericCommandInterceptor);
+    }
+
+    [TestMethod]
+    public void AddHandlersFromAssembly_ByDefault_RegistersGenericQueryInterceptor()
+    {
+        // Arrange
+        using var serviceProvider = ServiceProviderHelper.ConfigureServiceProvider(services =>
+        {
+            services.AddScoped(_ => new Queue<Type>());
+            services.AddCqrs(builder =>
+            {
+                builder.AddHandlersFromAssembly(GetType().Assembly);
+            });
+        });
+
+        // Act
+        var genericQueryInterceptor = serviceProvider.GetServices<IQueryInterceptor<SampleQuery, SampleQueryResult>>()
+            .FirstOrDefault(interceptor => interceptor is GenericQueryInterceptor<SampleQuery, SampleQueryResult>);
+
+        // Assert
+        Assert.IsNotNull(genericQueryInterceptor);
+    }
+
+    [TestMethod]
     public void AddHandlersFromAssembly_GivenAssemblyWithPartiallyClosedHandler_ThrowsInvalidOperationException()
     {
         // Arrange
