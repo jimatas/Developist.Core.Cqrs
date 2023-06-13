@@ -31,16 +31,9 @@ This eliminates the need for manual registration of handlers.
 #### Intercepting
 Another concept included in this library is that of interceptors. 
 Interceptors can be thought of as filters that allow you to add additional behavior around message processing. 
-The main purpose of an interceptor is to modify or enhance the behavior of a command or query handler.
+Their main purpose is to modify or enhance the behavior of a command or query handler. Additionally, they have the ability to cancel the processing of a message entirely.
 
-When a message is dispatched, the dispatcher first applies all the interceptors that have been registered for that message type. 
-The interceptors are arranged in a pipeline, with each interceptor being responsible for performing a specific behavior. 
-The pipeline starts with the first interceptor and proceeds to the last one in order.
-
-Each interceptor in the pipeline has the ability to modify the message, modify the result (in the case of a query), or even cancel the processing of the message entirely. 
-If an interceptor cancels the processing of the message, subsequent interceptors and the handler are not executed.
+When a message is dispatched, the dispatcher arranges all the registered interceptors for that message type into a pipeline. Each interceptor in the pipeline has the ability to modify the message or the result (in the case of a query) and is responsible for invoking the next interceptor using the provided delegate function. 
+The pipeline starts with the first interceptor and continues in order until it reaches the last interceptor, and ultimately, the handler.
 
 To ensure that interceptors run in a predetermined order, they can optionally implement the [`IPrioritizable`](src/Developist.Core.Cqrs/IPrioritizable.cs) interface and return the appropriate [`PriorityLevel`](src/Developist.Core.Cqrs/PriorityLevel.cs) from the `Priority` property.
-
-The handler is the last component in the pipeline and is responsible for the actual processing of the message. 
-Once all the interceptors in the pipeline have been applied, the dispatcher invokes the handler's `HandleAsync` method, passing in the modified message (if any).
