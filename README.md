@@ -31,9 +31,8 @@ This eliminates the need for manual registration of handlers.
 #### Intercepting
 Another concept included in this library is that of interceptors. 
 Interceptors can be thought of as filters that allow you to add additional behavior around message processing. 
-Their main purpose is to modify or enhance the behavior of a command or query handler. Additionally, they have the ability to cancel the processing of a message entirely.
+Their main purpose is to modify or enhance the behavior of a command or query handler.
 
-When a message is dispatched, the dispatcher arranges all the registered interceptors for that message type into a pipeline. Each interceptor in the pipeline has the ability to modify the message or the result (in the case of a query) and is responsible for invoking the next interceptor using the provided delegate function. 
-The pipeline starts with the first interceptor and continues in order until it reaches the last interceptor, and ultimately, the handler.
+When a message is dispatched, the dispatcher arranges all the registered interceptors for that message type into a pipeline. Each interceptor in the pipeline has the ability to modify the message or the result (in the case of a query) and is responsible for invoking the next interceptor using the provided delegate function. By choosing not to invoke the delegate, the interceptors possess the ability to effectively cancel the processing of a message entirely.
 
-To ensure that interceptors run in a predetermined order, they can optionally implement the [`IPrioritizable`](src/Developist.Core.Cqrs/IPrioritizable.cs) interface and return the appropriate [`PriorityLevel`](src/Developist.Core.Cqrs/PriorityLevel.cs) from the `Priority` property.
+The pipeline starts with the first interceptor and continues in order until it reaches the last interceptor, and ultimately, the handler. To ensure that interceptors run in a predetermined order, they can optionally implement the [`IPrioritizable`](src/Developist.Core.Cqrs/IPrioritizable.cs) interface and return the appropriate [`PriorityLevel`](src/Developist.Core.Cqrs/PriorityLevel.cs) from the `Priority` property.
