@@ -2,13 +2,13 @@
 
 public class BaseQueryHandler : IQueryHandler<BaseQuery, SampleQueryResult>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public BaseQueryHandler(Queue<Type> log) => _log = log;
+    public BaseQueryHandler(Queue<object> log) => _log = log;
 
     public Task<SampleQueryResult> HandleAsync(BaseQuery query, CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return Task.FromResult(new SampleQueryResult());
     }
 }

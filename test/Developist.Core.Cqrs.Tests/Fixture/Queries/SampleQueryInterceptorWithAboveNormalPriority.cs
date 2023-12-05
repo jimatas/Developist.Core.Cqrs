@@ -1,16 +1,18 @@
 ﻿namespace Developist.Core.Cqrs.Tests.Fixture.Queries;
 
-public class SampleQueryInterceptorWithAboveNormalPriority : IQueryInterceptor<SampleQuery, SampleQueryResult>, IPrioritizable
+[PipelinePriority(PriorityLevel.AboveNormal)]
+public class SampleQueryInterceptorWithAboveNormalPriority : IQueryInterceptor<SampleQuery, SampleQueryResult>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public SampleQueryInterceptorWithAboveNormalPriority(Queue<Type> log) => _log = log;
+    public SampleQueryInterceptorWithAboveNormalPriority(Queue<object> log) => _log = log;
 
-    public PriorityLevel Priority => PriorityLevel.AboveNormal;
-
-    public Task<SampleQueryResult> InterceptAsync(SampleQuery query, QueryHandlerDelegate<SampleQuery, SampleQueryResult> next, CancellationToken cancellationToken)
+    public Task<SampleQueryResult> InterceptAsync(
+        SampleQuery query,
+        QueryHandlerDelegate<SampleQuery, SampleQueryResult> next,
+        CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return next(query, cancellationToken);
     }
 }

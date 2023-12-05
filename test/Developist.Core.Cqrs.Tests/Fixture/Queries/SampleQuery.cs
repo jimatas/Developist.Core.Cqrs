@@ -1,3 +1,3 @@
 ﻿namespace Developist.Core.Cqrs.Tests.Fixture.Queries;
 
-public record SampleQuery : IQuery<SampleQueryResult>;
+public readonly record struct SampleQuery : IQuery<SampleQueryResult>;

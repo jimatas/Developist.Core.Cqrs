@@ -2,13 +2,13 @@
 
 public class SampleEventHandler : IEventHandler<SampleEvent>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public SampleEventHandler(Queue<Type> log) => _log = log;
+    public SampleEventHandler(Queue<object> log) => _log = log;
 
     public Task HandleAsync(SampleEvent @event, CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return Task.CompletedTask;
     }
 }

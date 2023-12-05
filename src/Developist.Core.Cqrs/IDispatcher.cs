@@ -1,9 +1,8 @@
-﻿namespace Developist.Core.Cqrs
+﻿namespace Developist.Core.Cqrs;
+
+/// <summary>
+/// Represents a dispatcher interface that combines command, query, and event dispatching capabilities.
+/// </summary>
+public interface IDispatcher : ICommandDispatcher, IQueryDispatcher, IEventDispatcher
 {
-    /// <summary>
-    /// Defines a dispatcher that can dispatch commands, events, and queries to their corresponding handlers.
-    /// </summary>
-    public interface IDispatcher : ICommandDispatcher, IEventDispatcher, IQueryDispatcher
-    {
-    }
 }

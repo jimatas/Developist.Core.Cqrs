@@ -1,156 +1,158 @@
 ﻿using Developist.Core.Cqrs.Tests.Fixture.Events;
-using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Developist.Core.Cqrs.Tests;
 
 [TestClass]
-public class EventTests
+public class EventTests : TestClassBase
 {
-    private readonly Queue<Type> _log = new();
-
     [TestMethod]
-    public async Task DispatchAsync_GivenNull_ThrowsNullArgumentException()
+    public async Task DispatchAsync_NullEvent_ThrowsArgumentNullException()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+            });
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+        IEvent @event = null!;
 
         // Act
-        var action = () => eventDispatcher.DispatchAsync<SampleEvent>(null!);
+        var action = () => dispatcher.DispatchAsync(@event);
 
         // Assert
         var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
-        Assert.AreEqual("Value cannot be null. (Parameter 'event')", exception.Message);
+        Assert.AreEqual(nameof(@event), exception.ParamName);
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenBaseEvent_DispatchesToBaseEventHandler()
+    public async Task DispatchAsync_SampleEvent_DispatchesToSampleEventHandler()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
-        // Act
-        await eventDispatcher.DispatchAsync(new BaseEvent());
-
-        // Assert
-        Assert.AreEqual(1, _log.Count);
-        Assert.AreEqual(typeof(BaseEventHandler), _log.Single());
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenBaseEventAsIEvent_DoesNotDispatch()
-    {
-        // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
-        // Act
-        await eventDispatcher.DispatchAsync((IEvent)new BaseEvent());
-
-        // Assert
-        Assert.IsFalse(_log.Any());
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenDerivedEvent_DispatchesToDerivedEventHandler()
-    {
-        // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
-        // Act
-        await eventDispatcher.DispatchAsync(new DerivedEvent());
-
-        // Assert
-        Assert.AreEqual(1, _log.Count);
-        Assert.AreEqual(typeof(DerivedEventHandler), _log.Single());
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenDerivedEventAsIEvent_DoesNotDispatch()
-    {
-        // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
-        // Act
-        await eventDispatcher.DispatchAsync((IEvent)new DerivedEvent());
-
-        // Assert
-        Assert.IsFalse(_log.Any());
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenSampleEvent_DispatchesToAllAppropriateEventHandlers()
-    {
-        // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
-        // Act
-        await eventDispatcher.DispatchAsync(new SampleEvent());
-
-        // Assert
-        Assert.AreEqual(2, _log.Count);
-        Assert.IsTrue(_log.Contains(typeof(SampleEventHandler)));
-        Assert.IsTrue(_log.Contains(typeof(AnotherSampleEventHandler)));
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenSampleEventAsIEvent_DoesNotDispatch()
-    {
-        // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
-
-        // Act
-        await eventDispatcher.DispatchAsync((IEvent)new SampleEvent());
-
-        // Assert
-        Assert.IsFalse(_log.Any());
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenFaultingEvent_DispatchesToAll()
-    {
-        // Arrange
-        using var serviceProvider = ServiceProviderHelper.ConfigureServiceProvider(services =>
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
         {
-            services.AddCqrs(builder =>
+            services.AddCqrs(cfg =>
             {
-                builder.AddDispatchers();
-                builder.AddEventHandler<SampleEvent, SampleEventHandler>();
-                builder.AddEventHandler<SampleEvent, FaultingEventHandler>();
-                builder.AddEventHandler<SampleEvent, AnotherSampleEventHandler>();
+                cfg.AddDefaultDispatcher();
+                cfg.AddEventHandler<SampleEvent, SampleEventHandler>();
             });
-            services.AddScoped(_ => _log);
+            services.AddScoped(_ => log);
         });
 
-        var eventDispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+        var dispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
 
         // Act
-        var action = () => eventDispatcher.DispatchAsync(new SampleEvent());
+        await dispatcher.DispatchAsync(new SampleEvent());
+
+        // Assert
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<SampleEventHandler>(log.Dequeue());
+    }
+
+    [TestMethod]
+    public async Task DispatchAsync_SampleEventAsIEvent_DoesNotDispatch()
+    {
+        // Arrange
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddEventHandler<SampleEvent, SampleEventHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+
+        // Act
+        await dispatcher.DispatchAsync((IEvent)new SampleEvent());
+
+        // Assert
+        Assert.IsFalse(log.Any());
+    }
+
+    [TestMethod]
+    public async Task DispatchAsync_BaseEvent_DispatchesToBaseEventHandler()
+    {
+        // Arrange
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddEventHandler<BaseEvent, BaseEventHandler>();
+                cfg.AddEventHandler<DerivedEvent, DerivedEventHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+
+        // Act
+        await dispatcher.DispatchAsync(new BaseEvent());
+
+        // Assert
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<BaseEventHandler>(log.Dequeue());
+    }
+
+    [TestMethod]
+    public async Task DispatchAsync_DerivedEvent_DispatchesToDerivedEventHandler()
+    {
+        // Arrange
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddEventHandler<BaseEvent, BaseEventHandler>();
+                cfg.AddEventHandler<DerivedEvent, DerivedEventHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+
+        // Act
+        await dispatcher.DispatchAsync(new DerivedEvent());
+
+        // Assert
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<DerivedEventHandler>(log.Dequeue());
+    }
+
+    [TestMethod]
+    public async Task DispatchAsync_FaultingEventHandler_StillDispatchesToOthers()
+    {
+        // Arrange
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddEventHandler<SampleEvent, FaultingSampleEventHandler>();
+                cfg.AddEventHandler<SampleEvent, SampleEventHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IEventDispatcher>();
+
+        // Act
+        var action = () => dispatcher.DispatchAsync(new SampleEvent());
 
         // Assert
         await Assert.ThrowsExceptionAsync<AggregateException>(action);
-        Assert.AreEqual(2, _log.Count);
-    }
-
-    private ServiceProvider CreateServiceProviderWithDefaultConfiguration()
-    {
-        return ServiceProviderHelper.ConfigureServiceProvider(services =>
-        {
-            services.AddCqrs(builder =>
-            {
-                builder.AddDispatchers();
-                builder.AddEventHandler<BaseEvent, BaseEventHandler>();
-                builder.AddEventHandler<DerivedEvent, DerivedEventHandler>();
-                builder.AddEventHandler<SampleEvent, SampleEventHandler>();
-                builder.AddEventHandler<SampleEvent, AnotherSampleEventHandler>();
-            });
-            services.AddScoped(_ => _log);
-        });
+        Assert.IsTrue(log.Any());
     }
 }
