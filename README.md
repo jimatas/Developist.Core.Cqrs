@@ -3,13 +3,13 @@
 ### Lightweight (no dependency) in-process CQRS library
 
 To define a command message, simply inherit from the [`ICommand`](src/Developist.Core.Cqrs/Commands/ICommand.cs) interface.
-Similarly, to define a query message, inherit from the [`IQuery<TResult>`](src/Developist.Core.Cqrs/Queries/IQuery`1.cs) generic interface.
+Similarly, to define a query message, inherit from the [`IQuery<TResult>`](src/Developist.Core.Cqrs/Queries/IQuery.cs) generic interface.
 For notification-style messages, inherit from the [`IEvent`](src/Developist.Core.Cqrs/Events/IEvent.cs) interface.
 Note that these are marker interfaces and do not declare any members that have to be implemented.
 
 #### Handling
 To process instances of these message types, you need to define handlers by inheriting from the appropriate interfaces.
-Specifically, you should derive from the [`ICommandHandler<T>`](src/Developist.Core.Cqrs/Commands/ICommandHandler`1.cs), [`IQueryHandler<T, TResult>`](src/Developist.Core.Cqrs/Queries/IQueryHandler`2.cs), or [`IEventHandler<T>`](src/Developist.Core.Cqrs/Events/IEventHandler`1.cs) generic interfaces.
+Specifically, you should derive from the [`ICommandHandler<T>`](src/Developist.Core.Cqrs/Commands/ICommandHandler.cs), [`IQueryHandler<T, TResult>`](src/Developist.Core.Cqrs/Queries/IQueryHandler.cs), or [`IEventHandler<T>`](src/Developist.Core.Cqrs/Events/IEventHandler.cs) generic interfaces.
 All of these interfaces declare a single `HandleAsync` method that needs to be implemented.
 
 For example, to handle the `SendEmailCommand` message, you need to create a handler that derives from `ICommandHandler<SendEmailCommand>` and implements the `HandleAsync(SendEmailCommand command, CancellationToken cancellationToken)` method.
