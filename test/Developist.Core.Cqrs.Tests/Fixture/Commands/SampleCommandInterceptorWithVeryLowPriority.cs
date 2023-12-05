@@ -1,16 +1,18 @@
 ﻿namespace Developist.Core.Cqrs.Tests.Fixture.Commands;
 
-public class SampleCommandInterceptorWithVeryLowPriority : ICommandInterceptor<SampleCommand>, IPrioritizable
+[PipelinePriority(PriorityLevel.VeryLow)]
+public class SampleCommandInterceptorWithVeryLowPriority : ICommandInterceptor<SampleCommand>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public SampleCommandInterceptorWithVeryLowPriority(Queue<Type> log) => _log = log;
+    public SampleCommandInterceptorWithVeryLowPriority(Queue<object> log) => _log = log;
 
-    public PriorityLevel Priority => PriorityLevel.VeryLow;
-
-    public Task InterceptAsync(SampleCommand command, CommandHandlerDelegate<SampleCommand> next, CancellationToken cancellationToken)
+    public Task InterceptAsync(
+        SampleCommand command,
+        CommandHandlerDelegate<SampleCommand> next,
+        CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return next(command, cancellationToken);
     }
 }

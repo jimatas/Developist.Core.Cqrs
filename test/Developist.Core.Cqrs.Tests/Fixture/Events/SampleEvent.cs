@@ -1,3 +1,3 @@
 ﻿namespace Developist.Core.Cqrs.Tests.Fixture.Events;
 
-public record SampleEvent : IEvent;
+public readonly record struct SampleEvent : IEvent;

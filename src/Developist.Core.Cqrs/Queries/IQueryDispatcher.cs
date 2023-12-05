@@ -1,20 +1,16 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Developist.Core.Cqrs;
 
-namespace Developist.Core.Cqrs
+/// <summary>
+/// Represents a query dispatcher responsible for dispatching queries and returning results.
+/// </summary>
+public interface IQueryDispatcher
 {
     /// <summary>
-    /// Defines the contract for a query dispatcher.
+    /// Dispatches the specified query asynchronously to its corresponding handler and returns the query result of type <typeparamref name="TResult"/>.
     /// </summary>
-    public interface IQueryDispatcher
-    {
-        /// <summary>
-        /// Dispatches a query asynchronously to its registered handler and returns the result.
-        /// </summary>
-        /// <typeparam name="TResult">The type of the result returned by the query.</typeparam>
-        /// <param name="query">The query to be dispatched.</param>
-        /// <param name="cancellationToken">The cancellation token to observe.</param>
-        /// <returns>A task representing the asynchronous operation, which returns the result of the query.</returns>
-        Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
-    }
+    /// <typeparam name="TResult">The type of result expected from the query.</typeparam>
+    /// <param name="query">The query to dispatch.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task representing the asynchronous operation. The task result contains the query result of type <typeparamref name="TResult"/>.</returns>
+    Task<TResult> DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default);
 }

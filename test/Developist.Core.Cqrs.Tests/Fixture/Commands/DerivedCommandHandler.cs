@@ -2,13 +2,13 @@
 
 public class DerivedCommandHandler : ICommandHandler<DerivedCommand>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public DerivedCommandHandler(Queue<Type> log) => _log = log;
+    public DerivedCommandHandler(Queue<object> log) => _log = log;
 
     public Task HandleAsync(DerivedCommand command, CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return Task.CompletedTask;
     }
 }

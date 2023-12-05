@@ -1,21 +1,17 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
+﻿namespace Developist.Core.Cqrs;
 
-namespace Developist.Core.Cqrs
+/// <summary>
+/// Represents an event dispatcher responsible for dispatching events.
+/// </summary>
+public interface IEventDispatcher
 {
     /// <summary>
-    /// Defines the contract for an event dispatcher.
+    /// Dispatches the specified event asynchronously to its corresponding handlers.
     /// </summary>
-    public interface IEventDispatcher
-    {
-        /// <summary>
-        /// Dispatches an event asynchronously to its registered handlers.
-        /// </summary>
-        /// <typeparam name="TEvent">The type of the event to be dispatched, which must implement the <see cref="IEvent"/> interface.</typeparam>
-        /// <param name="event">The event to be dispatched.</param>
-        /// <param name="cancellationToken">The cancellation token to observe.</param>
-        /// <returns>A task representing the asynchronous operation.</returns>
-        Task DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
-            where TEvent : IEvent;
-    }
+    /// <typeparam name="TEvent">The type of event to dispatch.</typeparam>
+    /// <param name="event">The event to dispatch.</param>
+    /// <param name="cancellationToken">A cancellation token that can be used to cancel the operation.</param>
+    /// <returns>A task representing the asynchronous operation.</returns>
+    Task DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken = default)
+        where TEvent : IEvent;
 }

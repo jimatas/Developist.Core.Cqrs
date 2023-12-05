@@ -1,122 +1,168 @@
 ﻿using Developist.Core.Cqrs.Tests.Fixture.Commands;
-using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace Developist.Core.Cqrs.Tests;
 
 [TestClass]
-public class CommandTests
+public class CommandTests : TestClassBase
 {
-    private readonly Queue<Type> _log = new();
-
     [TestMethod]
-    public async Task DispatchAsync_GivenNull_ThrowsNullArgumentException()
+    public async Task DispatchAsync_NullCommand_ThrowsArgumentNullException()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+            });
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        ICommand command = null!;
 
         // Act
-        var action = () => commandDispatcher.DispatchAsync<ICommand>(null!);
+        var action = () => dispatcher.DispatchAsync(command);
 
         // Assert
         var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
-        Assert.AreEqual("Value cannot be null. (Parameter 'command')", exception.Message);
+        Assert.AreEqual(nameof(command), exception.ParamName);
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenBaseCommand_DispatchesToBaseCommandHandler()
+    public async Task DispatchAsync_SampleCommand_DispatchesToSampleCommandHandler()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddCommandHandler<SampleCommand, SampleCommandHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
 
         // Act
-        await commandDispatcher.DispatchAsync(new BaseCommand());
+        await dispatcher.DispatchAsync(new SampleCommand());
 
         // Assert
-        Assert.AreEqual(1, _log.Count);
-        Assert.AreEqual(typeof(BaseCommandHandler), _log.Single());
+        Assert.IsInstanceOfType<SampleCommandHandler>(log.Dequeue());
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenBaseCommandAsICommand_ThrowsInvalidOperationException()
+    public async Task DispatchAsync_BaseCommand_DispatchesToBaseCommandHandler()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddCommandHandler<BaseCommand, BaseCommandHandler>();
+                cfg.AddCommandHandler<DerivedCommand, DerivedCommandHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
 
         // Act
-        var action = () => commandDispatcher.DispatchAsync((ICommand)new BaseCommand());
+        await dispatcher.DispatchAsync(new BaseCommand());
+
+        // Assert
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<BaseCommandHandler>(log.Single());
+    }
+
+    [TestMethod]
+    public async Task DispatchAsync_BaseCommandAsICommand_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddCommandHandler<BaseCommand, BaseCommandHandler>();
+                cfg.AddCommandHandler<DerivedCommand, DerivedCommandHandler>();
+            });
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+
+        // Act
+        var action = () => dispatcher.DispatchAsync((ICommand)new BaseCommand());
 
         // Assert
         var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(action);
-        Assert.AreEqual($"No handler found for command with type '{typeof(ICommand)}'.", exception.Message);
+        Assert.AreEqual($"No handler found for command '{typeof(ICommand)}'.", exception.Message);
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenDerivedCommand_DispatchesToDerivedCommandHandler()
+    public async Task DispatchAsync_DerivedCommand_DispatchesToDerivedCommandHandler()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddCommandHandler<BaseCommand, BaseCommandHandler>();
+                cfg.AddCommandHandler<DerivedCommand, DerivedCommandHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
 
         // Act
-        await commandDispatcher.DispatchAsync(new DerivedCommand());
+        await dispatcher.DispatchAsync(new DerivedCommand());
 
         // Assert
-        Assert.AreEqual(1, _log.Count);
-        Assert.AreEqual(typeof(DerivedCommandHandler), _log.Single());
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<DerivedCommandHandler>(log.Single());
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenDerivedCommandAsICommand_ThrowsInvalidOperationException()
+    public async Task DispatchAsync_FaultingCommandHandler_LogsExceptionAndThrows()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        var log = new Queue<object>();
 
-        // Act
-        var action = () => commandDispatcher.DispatchAsync((ICommand)new DerivedCommand());
-
-        // Assert
-        var exception = await Assert.ThrowsExceptionAsync<InvalidOperationException>(action);
-        Assert.AreEqual($"No handler found for command with type '{typeof(ICommand)}'.", exception.Message);
-    }
-
-    [TestMethod]
-    public async Task DispatchAsync_GivenFaultingCommand_LogsExceptionAndThrowsIt()
-    {
-        // Arrange
-        var loggerMock = new Mock<ILogger<CommandDispatcher>>();
-        loggerMock.Setup(logger => logger.Log(
+        var logger = new Mock<ILogger<DefaultDispatcher>>();
+        logger.Setup(logger => logger.Log(
             It.IsAny<LogLevel>(),
             It.IsAny<EventId>(),
             It.IsAny<It.IsAnyType>(),
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
 
-        using var serviceProvider = ServiceProviderHelper.ConfigureServiceProvider(services =>
+        using var serviceProvider = ConfigureServiceProvider(services =>
         {
-            services.AddCqrs(builder =>
+            services.AddCqrs(cfg =>
             {
-                builder.AddDispatchers();
-                builder.AddCommandHandler<FaultingCommand, FaultingCommandHandler>();
+                cfg.AddDefaultDispatcher();
+                cfg.AddCommandHandler<SampleCommand, FaultingSampleCommandHandler>();
             });
-            services.AddScoped(_ => _log);
-            services.AddScoped(_ => loggerMock.Object);
+            services.AddScoped(_ => log);
+            services.AddScoped(_ => logger.Object);
         });
 
-        var commandDispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
 
         // Act
-        var action = () => commandDispatcher.DispatchAsync(new FaultingCommand());
+        var action = () => dispatcher.DispatchAsync(new SampleCommand());
 
         // Assert
         await Assert.ThrowsExceptionAsync<ApplicationException>(action);
-        loggerMock.Verify(logger => logger.Log(
+        logger.Verify(logger => logger.Log(
             LogLevel.Warning,
             It.IsAny<EventId>(),
             It.Is<It.IsAnyType>((state, _) => state.ToString()!.Equals("Unhandled exception during command dispatch: There was an error.")),
@@ -124,17 +170,39 @@ public class CommandTests
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
     }
 
-    private ServiceProvider CreateServiceProviderWithDefaultConfiguration()
+    [TestMethod]
+    public async Task DispatchAsync_SampleCommand_RunsInterceptorsInExpectedOrder()
     {
-        return ServiceProviderHelper.ConfigureServiceProvider(services =>
+        // Arrange
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
         {
-            services.AddCqrs(builder =>
+            services.AddCqrs(cfg =>
             {
-                builder.AddDispatchers();
-                builder.AddCommandHandler<BaseCommand, BaseCommandHandler>();
-                builder.AddCommandHandler<DerivedCommand, DerivedCommandHandler>();
+                cfg.AddDefaultDispatcher();
+                cfg.AddCommandHandler<SampleCommand, SampleCommandHandler>();
+                cfg.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithHighestPriority>();
+                cfg.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithLowestPriority>();
+                cfg.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithLowestPlusOnePriority>();
+                cfg.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithImplicitNormalPriority>();
+                cfg.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithVeryLowPriority>();
+                cfg.AddCommandInterceptor<SampleCommand, SampleCommandInterceptorWithVeryHighPriority>();
             });
-            services.AddScoped(_ => _log);
+            services.AddScoped(_ => log);
         });
+
+        var dispatcher = serviceProvider.GetRequiredService<ICommandDispatcher>();
+
+        // Act
+        await dispatcher.DispatchAsync(new SampleCommand());
+
+        // Assert
+        Assert.IsInstanceOfType<SampleCommandInterceptorWithHighestPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleCommandInterceptorWithVeryHighPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleCommandInterceptorWithImplicitNormalPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleCommandInterceptorWithVeryLowPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleCommandInterceptorWithLowestPlusOnePriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleCommandInterceptorWithLowestPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleCommandHandler>(log.Dequeue());
     }
 }

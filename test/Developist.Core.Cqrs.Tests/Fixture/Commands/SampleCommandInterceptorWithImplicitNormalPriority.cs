@@ -2,13 +2,16 @@
 
 public class SampleCommandInterceptorWithImplicitNormalPriority : ICommandInterceptor<SampleCommand>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public SampleCommandInterceptorWithImplicitNormalPriority(Queue<Type> log) => _log = log;
+    public SampleCommandInterceptorWithImplicitNormalPriority(Queue<object> log) => _log = log;
 
-    public Task InterceptAsync(SampleCommand command, CommandHandlerDelegate<SampleCommand> next, CancellationToken cancellationToken)
+    public Task InterceptAsync(
+        SampleCommand command,
+        CommandHandlerDelegate<SampleCommand> next,
+        CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return next(command, cancellationToken);
     }
 }

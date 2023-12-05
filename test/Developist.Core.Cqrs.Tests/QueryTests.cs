@@ -1,107 +1,167 @@
 ﻿using Developist.Core.Cqrs.Tests.Fixture.Queries;
-using Developist.Core.Cqrs.Tests.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Moq;
 
 namespace Developist.Core.Cqrs.Tests;
 
 [TestClass]
-public class QueryTests
+public class QueryTests : TestClassBase
 {
-    private readonly Queue<Type> _log = new();
-
     [TestMethod]
-    public async Task DispatchAsync_GivenNull_ThrowsNullArgumentException()
+    public async Task DispatchAsync_NullQuery_ThrowsArgumentNullException()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+            });
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+        IQuery<SampleQueryResult> query = null!;
 
         // Act
-        var action = () => queryDispatcher.DispatchAsync((BaseQuery)null!);
+        Task action() => dispatcher.DispatchAsync(query);
 
         // Assert
         var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
-        Assert.AreEqual("Value cannot be null. (Parameter 'query')", exception.Message);
+        Assert.AreEqual(nameof(query), exception.ParamName);
     }
 
     [TestMethod]
-    public async Task DispatchAsyncOverload_GivenNull_ThrowsNullArgumentException()
+    public async Task DefaultDispatcher_DispatchAsync_NullQuery_ThrowsArgumentNullException()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var queryDispatcher = (QueryDispatcher)serviceProvider.GetRequiredService<IQueryDispatcher>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+            });
+        });
+
+        var dispatcher = (DefaultDispatcher)serviceProvider.GetRequiredService<IQueryDispatcher>();
+        IQuery<SampleQueryResult> query = null!;
 
         // Act
-        var action = () => queryDispatcher.DispatchAsync<BaseQuery, SampleQueryResult>(null!);
+        Task action() => dispatcher.DispatchAsync<SampleQuery, SampleQueryResult>(query);
 
         // Assert
         var exception = await Assert.ThrowsExceptionAsync<ArgumentNullException>(action);
-        Assert.AreEqual("Value cannot be null. (Parameter 'query')", exception.Message);
+        Assert.AreEqual(nameof(query), exception.ParamName);
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenBaseQuery_DispatchesToBaseQueryHandler()
+    public async Task DispatchAsync_SampleQuery_DispatchesToSampleQueryHandler()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddQueryHandler<SampleQuery, SampleQueryResult, SampleQueryHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
 
         // Act
-        await queryDispatcher.DispatchAsync(new BaseQuery());
+        await dispatcher.DispatchAsync(new SampleQuery());
 
         // Assert
-        Assert.AreEqual(1, _log.Count);
-        Assert.AreEqual(typeof(BaseQueryHandler), _log.Single());
+        Assert.IsInstanceOfType<SampleQueryHandler>(log.Dequeue());
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenDerivedQuery_DispatchesToDerivedQueryHandler()
+    public async Task DispatchAsync_BaseQuery_DispatchesToBaseQueryHandler()
     {
         // Arrange
-        using var serviceProvider = CreateServiceProviderWithDefaultConfiguration();
-        var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddQueryHandler<BaseQuery, SampleQueryResult, BaseQueryHandler>();
+                cfg.AddQueryHandler<DerivedQuery, SampleQueryResult, DerivedQueryHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
 
         // Act
-        await queryDispatcher.DispatchAsync(new DerivedQuery());
+        await dispatcher.DispatchAsync(new BaseQuery());
 
         // Assert
-        Assert.AreEqual(1, _log.Count);
-        Assert.AreEqual(typeof(DerivedQueryHandler), _log.Single());
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<BaseQueryHandler>(log.Single());
     }
 
     [TestMethod]
-    public async Task DispatchAsync_GivenFaultingQuery_LogsExceptionAndThrowsIt()
+    public async Task DispatchAsync_DerivedQuery_DispatchesToDerivedQueryHandler()
     {
         // Arrange
-        var loggerMock = new Mock<ILogger<QueryDispatcher>>();
-        loggerMock.Setup(logger => logger.Log(
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
+        {
+            services.AddCqrs(cfg =>
+            {
+                cfg.AddDefaultDispatcher();
+                cfg.AddQueryHandler<BaseQuery, SampleQueryResult, BaseQueryHandler>();
+                cfg.AddQueryHandler<DerivedQuery, SampleQueryResult, DerivedQueryHandler>();
+            });
+            services.AddScoped(_ => log);
+        });
+
+        var dispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+
+        // Act
+        await dispatcher.DispatchAsync(new DerivedQuery());
+
+        // Assert
+        Assert.AreEqual(1, log.Count);
+        Assert.IsInstanceOfType<DerivedQueryHandler>(log.Single());
+    }
+
+    [TestMethod]
+    public async Task DispatchAsync_FaultingQueryHandler_LogsExceptionAndThrows()
+    {
+        // Arrange
+        var log = new Queue<object>();
+
+        var logger = new Mock<ILogger<DefaultDispatcher>>();
+        logger.Setup(logger => logger.Log(
             It.IsAny<LogLevel>(),
             It.IsAny<EventId>(),
             It.IsAny<It.IsAnyType>(),
             It.IsAny<Exception>(),
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
 
-        using var serviceProvider = ServiceProviderHelper.ConfigureServiceProvider(services =>
+        using var serviceProvider = ConfigureServiceProvider(services =>
         {
-            services.AddCqrs(builder =>
+            services.AddCqrs(cfg =>
             {
-                builder.AddDispatchers();
-                builder.AddQueryHandler<FaultingQuery, SampleQueryResult, FaultingQueryHandler>();
+                cfg.AddDefaultDispatcher();
+                cfg.AddQueryHandler<SampleQuery, SampleQueryResult, FaultingSampleQueryHandler>();
             });
-            services.AddScoped(_ => _log);
-            services.AddScoped(_ => loggerMock.Object);
+            services.AddScoped(_ => log);
+            services.AddScoped(_ => logger.Object);
         });
 
-        var queryDispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+        var dispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
 
         // Act
-        var action = () => queryDispatcher.DispatchAsync(new FaultingQuery());
+        var action = () => dispatcher.DispatchAsync(new SampleQuery());
 
         // Assert
         await Assert.ThrowsExceptionAsync<ApplicationException>(action);
-        loggerMock.Verify(logger => logger.Log(
+        logger.Verify(logger => logger.Log(
             LogLevel.Warning,
             It.IsAny<EventId>(),
             It.Is<It.IsAnyType>((state, _) => state.ToString()!.Equals("Unhandled exception during query dispatch: There was an error.")),
@@ -109,17 +169,41 @@ public class QueryTests
             It.IsAny<Func<It.IsAnyType, Exception?, string>>()));
     }
 
-    private ServiceProvider CreateServiceProviderWithDefaultConfiguration()
+    [TestMethod]
+    public async Task DispatchAsync_SampleQuery_RunsInterceptorsInExpectedOrder()
     {
-        return ServiceProviderHelper.ConfigureServiceProvider(services =>
+        // Arrange
+        var log = new Queue<object>();
+        using var serviceProvider = ConfigureServiceProvider(services =>
         {
-            services.AddCqrs(builder =>
+            services.AddCqrs(cfg =>
             {
-                builder.AddDispatchers();
-                builder.AddQueryHandler<BaseQuery, SampleQueryResult, BaseQueryHandler>();
-                builder.AddQueryHandler<DerivedQuery, SampleQueryResult, DerivedQueryHandler>();
+                cfg.AddDefaultDispatcher();
+                cfg.AddQueryHandler<SampleQuery, SampleQueryResult, SampleQueryHandler>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithBelowNormalPriority>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithHighestMinusThreePriority>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithAboveNormalPriority>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithLowPriority>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithVeryHighPriority>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithImplicitNormalPriority>();
+                cfg.AddQueryInterceptor<SampleQuery, SampleQueryResult, SampleQueryInterceptorWithHighestPriority>();
             });
-            services.AddScoped(_ => _log);
+            services.AddScoped(_ => log);
         });
+
+        var dispatcher = serviceProvider.GetRequiredService<IQueryDispatcher>();
+
+        // Act
+        _ = await dispatcher.DispatchAsync(new SampleQuery());
+
+        // Assert
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithHighestPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithHighestMinusThreePriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithVeryHighPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithAboveNormalPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithImplicitNormalPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithBelowNormalPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryInterceptorWithLowPriority>(log.Dequeue());
+        Assert.IsInstanceOfType<SampleQueryHandler>(log.Dequeue());
     }
 }

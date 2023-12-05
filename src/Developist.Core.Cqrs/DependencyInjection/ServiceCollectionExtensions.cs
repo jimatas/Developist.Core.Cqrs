@@ -1,29 +1,21 @@
-﻿using System;
+﻿namespace Microsoft.Extensions.DependencyInjection;
 
-namespace Microsoft.Extensions.DependencyInjection
+/// <summary>
+/// Provides extension methods for configuring CQRS-related services using an <see cref="IServiceCollection"/>.
+/// </summary>
+public static class ServiceCollectionExtensions
 {
     /// <summary>
-    /// Provides extension methods for the <see cref="IServiceCollection"/> interface to add CQRS services.
+    /// Adds CQRS-related services to the specified <see cref="IServiceCollection"/> and configures them using the provided configurator delegate.
     /// </summary>
-    public static class ServiceCollectionExtensions
+    /// <param name="services">The <see cref="IServiceCollection"/> to which CQRS services will be added.</param>
+    /// <param name="configure">A delegate that configures CQRS services using a <see cref="CqrsConfigurator"/>.</param>
+    /// <returns>The <see cref="IServiceCollection"/> with CQRS-related services added.</returns>
+    public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsConfigurator> configure)
     {
-        /// <summary>
-        /// Adds CQRS services to the specified <see cref="IServiceCollection"/> instance using the provided configuration delegate.
-        /// </summary>
-        /// <param name="services">The <see cref="IServiceCollection"/> instance to add services to.</param>
-        /// <param name="configureBuilder">A delegate that configures the <see cref="CqrsBuilder"/> instance.</param>
-        /// <returns>The <see cref="IServiceCollection"/> instance.</returns>
-        public static IServiceCollection AddCqrs(this IServiceCollection services, Action<CqrsBuilder> configureBuilder)
-        {
-            if (configureBuilder is null)
-            {
-                throw new ArgumentNullException(nameof(configureBuilder));
-            }
+        var configurator = new CqrsConfigurator(services);
+        configure(configurator);
 
-            var builder = new CqrsBuilder(services);
-            configureBuilder(builder);
-
-            return services;
-        }
+        return services;
     }
 }

@@ -2,13 +2,13 @@
 
 public class SampleCommandHandler : ICommandHandler<SampleCommand>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public SampleCommandHandler(Queue<Type> log) => _log = log;
+    public SampleCommandHandler(Queue<object> log) => _log = log;
 
     public Task HandleAsync(SampleCommand command, CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return Task.CompletedTask;
     }
 }

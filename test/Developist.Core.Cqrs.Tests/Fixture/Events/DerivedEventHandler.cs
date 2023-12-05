@@ -2,13 +2,13 @@
 
 public class DerivedEventHandler : IEventHandler<DerivedEvent>
 {
-    private readonly Queue<Type> _log;
+    private readonly Queue<object> _log;
 
-    public DerivedEventHandler(Queue<Type> log) => _log = log;
+    public DerivedEventHandler(Queue<object> log) => _log = log;
 
     public Task HandleAsync(DerivedEvent @event, CancellationToken cancellationToken)
     {
-        _log.Enqueue(GetType());
+        _log.Enqueue(this);
         return Task.CompletedTask;
     }
 }

@@ -1,3 +1,3 @@
 ﻿namespace Developist.Core.Cqrs.Tests.Fixture.Commands;
 
-public record SampleCommand : ICommand;
+public readonly record struct SampleCommand : ICommand;

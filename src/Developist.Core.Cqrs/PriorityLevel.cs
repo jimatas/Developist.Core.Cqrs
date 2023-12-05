@@ -1,57 +1,61 @@
-﻿namespace Developist.Core.Cqrs
+﻿namespace Developist.Core.Cqrs;
+
+/// <summary>
+/// Enumeration of priority levels for interceptors within a pipeline.
+/// </summary>
+public enum PriorityLevel : sbyte
 {
     /// <summary>
-    /// Provides a set of predefined constants that can be used to specify the priority level of interceptors within a pipeline.
+    /// The highest priority level.
+    /// Interceptors with this priority level run first in the pipeline.
     /// </summary>
-    /// <remarks>
-    /// A lower priority value indicates that the corresponding interceptor should run later in the pipeline, 
-    /// while a higher priority value indicates that the interceptor should run earlier in the pipeline.
-    /// </remarks>
-    public enum PriorityLevel : sbyte
-    {
-        /// <summary>
-        /// Interceptors with this priority level should run first in the pipeline.
-        /// </summary>
-        Highest = 127,
+    Highest = 127,
 
-        /// <summary>
-        /// Interceptors with this priority level should run early in the pipeline, after the highest priority interceptors.
-        /// </summary>
-        VeryHigh = 96,
+    /// <summary>
+    /// A very high priority level.
+    /// Interceptors with this priority level run after the <see cref="Highest"/> ones but before the <see cref="High"/> ones.
+    /// </summary>
+    VeryHigh = 96,
 
-        /// <summary>
-        /// Interceptors with this priority level should run before most other interceptors.
-        /// </summary>
-        High = 64,
+    /// <summary>
+    /// A high priority level.
+    /// Interceptors with this priority level run after the <see cref="VeryHigh"/> ones but before the <see cref="AboveNormal"/> ones.
+    /// </summary>
+    High = 64,
 
-        /// <summary>
-        /// Interceptors with this priority level should run after high-priority interceptors but before normal-priority interceptors.
-        /// </summary>
-        AboveNormal = 32,
+    /// <summary>
+    /// An above-normal priority level.
+    /// Interceptors with this priority level run after the <see cref="High"/> ones but before the <see cref="Normal"/> ones.
+    /// </summary>
+    AboveNormal = 32,
 
-        /// <summary>
-        /// Interceptors with this priority level should run at a standard position in the pipeline.
-        /// </summary>
-        Normal = 0,
+    /// <summary>
+    /// The normal priority level. This is the default priority level and is used when no specific priority is specified.
+    /// Interceptors with <see cref="Normal"/> priority run after all higher-priority interceptors.
+    /// </summary>
+    Normal = 0,
 
-        /// <summary>
-        /// Interceptors with this priority level should run after normal priority interceptors, but before low priority interceptors.
-        /// </summary>
-        BelowNormal = -32,
+    /// <summary>
+    /// A below-normal priority level.
+    /// Interceptors with this priority level run after the <see cref="Normal"/> ones but before the <see cref="Low"/> ones.
+    /// </summary>
+    BelowNormal = -32,
 
-        /// <summary>
-        /// Interceptors with this priority level should run later in the pipeline, after normal and below-normal priority interceptors.
-        /// </summary>
-        Low = -64,
+    /// <summary>
+    /// A low priority level.
+    /// Interceptors with this priority level run after the <see cref="BelowNormal"/> ones but before the <see cref="VeryLow"/> ones.
+    /// </summary>
+    Low = -64,
 
-        /// <summary>
-        /// Interceptors with this priority level should run near the end of the pipeline, before the lowest priority interceptors.
-        /// </summary>
-        VeryLow = -96,
+    /// <summary>
+    /// A very low priority level.
+    /// Interceptors with this priority level run after the <see cref="Low"/> ones but before the <see cref="Lowest"/> ones.
+    /// </summary>
+    VeryLow = -96,
 
-        /// <summary>
-        /// Interceptors with this priority level should run last in the pipeline.
-        /// </summary>
-        Lowest = -128
-    }
+    /// <summary>
+    /// The lowest priority level.
+    /// Interceptors with this priority level run last in the pipeline.
+    /// </summary>
+    Lowest = -128
 }
