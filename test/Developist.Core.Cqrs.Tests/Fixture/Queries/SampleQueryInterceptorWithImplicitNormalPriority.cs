@@ -1,9 +1,5 @@
 ﻿namespace Developist.Core.Cqrs.Tests.Fixture.Queries;
 
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 public class SampleQueryInterceptorWithImplicitNormalPriority : IQueryInterceptor<SampleQuery, SampleQueryResult>
 {
     private readonly Queue<object> _log;

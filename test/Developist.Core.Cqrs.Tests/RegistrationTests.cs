@@ -1,7 +1,6 @@
 ﻿using Developist.Core.Cqrs.Tests.Fixture.Commands;
 using Developist.Core.Cqrs.Tests.Fixture.Queries;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 
 namespace Developist.Core.Cqrs.Tests;
 

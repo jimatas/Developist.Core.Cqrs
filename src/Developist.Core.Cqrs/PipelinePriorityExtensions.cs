@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Developist.Core.Cqrs;
+﻿namespace Developist.Core.Cqrs;
 
 /// <summary>
 /// Provides extension methods for determining the priority levels of command and query interceptors in a CQRS pipeline.
