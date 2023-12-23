@@ -5,7 +5,11 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Developist.Core.Cqrs", "src\Developist.Core.Cqrs\Developist.Core.Cqrs.csproj", "{D41AB669-215F-4962-A302-8D0976456382}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Developist.Core.Cqrs.Tests", "test\Developist.Core.Cqrs.Tests\Developist.Core.Cqrs.Tests.csproj", "{2499A197-8B8F-4903-B8AB-D148FE55E6B7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Developist.Core.Cqrs.Tests", "test\Developist.Core.Cqrs.Tests\Developist.Core.Cqrs.Tests.csproj", "{2499A197-8B8F-4903-B8AB-D148FE55E6B7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{6523F1C1-71B4-4CF5-AB29-DC72942ECD9E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{6A15FF10-695E-4149-9543-0D55E93FBD70}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,6 +28,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D41AB669-215F-4962-A302-8D0976456382} = {6523F1C1-71B4-4CF5-AB29-DC72942ECD9E}
+		{2499A197-8B8F-4903-B8AB-D148FE55E6B7} = {6A15FF10-695E-4149-9543-0D55E93FBD70}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {31F41748-A350-4AE8-8507-C28F4B3931B2}
