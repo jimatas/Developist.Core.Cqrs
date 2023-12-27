@@ -1,4 +1,5 @@
-﻿using Developist.Core.Cqrs;
+﻿using Developist.Core.ArgumentValidation;
+using Developist.Core.Cqrs;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection;
@@ -136,10 +137,7 @@ public static class CqrsConfiguratorExtensions
     /// <exception cref="InvalidOperationException"/>
     public static CqrsConfigurator AddHandlersFromAssembly(this CqrsConfigurator configurator, Assembly assembly, ServiceLifetime lifetime = ServiceLifetime.Scoped)
     {
-        if (assembly is null)
-        {
-            throw new ArgumentNullException(nameof(assembly));
-        }
+        Ensure.Argument.NotNull(assembly);
 
         var handlerInterfaces = new[]
         {

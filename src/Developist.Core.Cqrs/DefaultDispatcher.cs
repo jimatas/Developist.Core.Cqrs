@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Developist.Core.ArgumentValidation;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Developist.Core.Cqrs;
@@ -19,17 +20,14 @@ public sealed class DefaultDispatcher : IDispatcher
     /// <param name="logger">Optional logger for logging dispatch operations.</param>
     public DefaultDispatcher(IHandlerRegistry registry, ILogger<DefaultDispatcher>? logger = default)
     {
-        _registry = registry ?? throw new ArgumentNullException(nameof(registry));
+        _registry = Ensure.Argument.NotNull(registry);
         _logger = logger ?? NullLogger<DefaultDispatcher>.Instance;
     }
 
     /// <inheritdoc/>
     async Task ICommandDispatcher.DispatchAsync<TCommand>(TCommand command, CancellationToken cancellationToken)
     {
-        if (command is null)
-        {
-            throw new ArgumentNullException(nameof(command));
-        }
+        Ensure.Argument.NotNull(command);
 
         var handler = _registry.GetCommandHandler<TCommand>();
         var interceptors = _registry.GetCommandInterceptors<TCommand>();
@@ -71,10 +69,7 @@ public sealed class DefaultDispatcher : IDispatcher
     /// <inheritdoc/>
     Task<TResult> IQueryDispatcher.DispatchAsync<TResult>(IQuery<TResult> query, CancellationToken cancellationToken)
     {
-        if (query is null)
-        {
-            throw new ArgumentNullException(nameof(query));
-        }
+        Ensure.Argument.NotNull(query);
 
         var queryType = query.GetType();
         var resultType = typeof(TResult);
@@ -106,10 +101,7 @@ public sealed class DefaultDispatcher : IDispatcher
     public async Task<TResult> DispatchAsync<TQuery, TResult>(IQuery<TResult> query, CancellationToken cancellationToken = default)
         where TQuery : IQuery<TResult>
     {
-        if (query is null)
-        {
-            throw new ArgumentNullException(nameof(query));
-        }
+        Ensure.Argument.NotNull(query);
 
         var handler = _registry.GetQueryHandler<TQuery, TResult>();
         var interceptors = _registry.GetQueryInterceptors<TQuery, TResult>();
@@ -151,10 +143,7 @@ public sealed class DefaultDispatcher : IDispatcher
     /// <inheritdoc/>
     async Task IEventDispatcher.DispatchAsync<TEvent>(TEvent @event, CancellationToken cancellationToken)
     {
-        if (@event is null)
-        {
-            throw new ArgumentNullException(nameof(@event));
-        }
+        Ensure.Argument.NotNull(@event, nameof(@event));
 
         var handlers = _registry.GetEventHandlers<TEvent>();
         var handleTask = Task.WhenAll(handlers.Select(handler => HandleWithLoggingAsync(@event, handler, cancellationToken)));

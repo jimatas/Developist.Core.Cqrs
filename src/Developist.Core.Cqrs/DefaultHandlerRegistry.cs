@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Developist.Core.ArgumentValidation;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Developist.Core.Cqrs;
 
@@ -18,7 +19,7 @@ public sealed class DefaultHandlerRegistry : IHandlerRegistry
     /// <param name="serviceProvider">The service provider used to resolve handlers and interceptors.</param>
     public DefaultHandlerRegistry(IServiceProvider serviceProvider)
     {
-        _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+        _serviceProvider = Ensure.Argument.NotNull(serviceProvider);
     }
 
     /// <inheritdoc/>

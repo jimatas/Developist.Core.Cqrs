@@ -1,18 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>Lightweight CQRS library built around an in-process mediator that can dispatch command, query, and event messages for processing by custom-defined handlers.</Description>
-    <Authors>Jim Atas</Authors>
-    <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
-    <Version>10.0.0</Version>
-    <AssemblyVersion>$(Version.Split('.')[0]).$(Version.Split('.')[1]).0.0</AssemblyVersion>
-    <FileVersion>$(Version.Split('.')[0]).$(Version.Split('.')[1]).$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays))).$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</FileVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>10</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <IsPackable>true</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Description>Lightweight CQRS library built around an in-process mediator that can dispatch command, query, and event messages for processing by custom-defined handlers.</Description>
+    <Authors>Jim Atas</Authors>
+    <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
     <PackageTags>cqrs;command;query;event;mediator</PackageTags>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/jimatas/Developist.Core.Cqrs</PackageProjectUrl>
@@ -20,7 +19,21 @@
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <Version>10.0.0</Version>
+    <AssemblyMajorVersion>$(Version.Split('.')[0])</AssemblyMajorVersion>
+    <AssemblyMinorVersion>$(Version.Split('.')[1])</AssemblyMinorVersion>
+    <AssemblyBuildNumber>$([System.Math]::Floor($([System.DateTime]::Now.Subtract($([System.DateTime]::Parse("01-01-2000"))).TotalDays)))</AssemblyBuildNumber>
+    <AssemblyRevisionNumber>$([System.Math]::Floor($([MSBuild]::Divide($([System.DateTime]::Now.Subtract($([System.DateTime]::Today)).TotalSeconds), 2.0))))</AssemblyRevisionNumber>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AssemblyVersion>$(AssemblyMajorVersion).$(AssemblyMinorVersion).0.0</AssemblyVersion>
+    <FileVersion>$(AssemblyMajorVersion).$(AssemblyMinorVersion).$(AssemblyBuildNumber).$(AssemblyRevisionNumber)</FileVersion>
+  </PropertyGroup>
+
   <ItemGroup>
+    <PackageReference Include="Developist.Core.ArgumentValidation" Version="1.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
   </ItemGroup>
