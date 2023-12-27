@@ -13,6 +13,7 @@
     <Authors>Jim Atas</Authors>
     <Copyright>Copyright (c) $([System.DateTime]::Now.Year) $(Authors)</Copyright>
     <PackageTags>cqrs;command;query;event;mediator</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageProjectUrl>https://github.com/jimatas/Developist.Core.Cqrs</PackageProjectUrl>
     <RepositoryUrl>https://github.com/jimatas/Developist.Core.Cqrs</RepositoryUrl>
@@ -31,6 +32,13 @@
     <AssemblyVersion>$(AssemblyMajorVersion).$(AssemblyMinorVersion).0.0</AssemblyVersion>
     <FileVersion>$(AssemblyMajorVersion).$(AssemblyMinorVersion).$(AssemblyBuildNumber).$(AssemblyRevisionNumber)</FileVersion>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Developist.Core.ArgumentValidation" Version="1.0.0" />
